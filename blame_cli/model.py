@@ -41,7 +41,7 @@ class Record:
                 raise ValueError(f"{field} must not be empty")
         score = data.get("score")
         if (isinstance(score, bool) or not isinstance(score, (int, float))
-                or not math.isfinite(score) or not 0 <= score <= 1):
+                or not 0 <= score <= 1 or not math.isfinite(score)):
             raise ValueError("score must be a finite number in [0, 1]")
         judge = data.get("judge_run")
         if judge is not None and type(judge) is not int:

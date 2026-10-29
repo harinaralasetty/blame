@@ -1,8 +1,7 @@
 """Pure, precision-first detectors. None perform I/O or call an LLM."""
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import asdict
-from itertools import combinations
 import re
 from typing import Protocol, Sequence
 
@@ -14,10 +13,10 @@ from .model import Finding, Record
 INFRA_RULES = (
     ("error_field", None, 0.99),
     ("empty_output", None, 0.98),
-    ("timeout", r"(?:error:\s*)?(?:(?:request|connection|operation)\s+)?(?:timed?\s*out|timeout(?:error)?)(?:[.: ].*)?", 0.95),
-    ("rate_limit", r"(?:error:\s*)?(?:rate[ -]limit(?:ed| exceeded)?|too many requests|(?:http(?: error)?\s*:?\s*)?429)(?:[.: ].*)?", 0.96),
-    ("server_error", r"(?:error:\s*)?(?:(?:http(?: error)?|status(?: code)?)\s*[:=]?\s*5\d\d\b.*|5\d\d(?:\s+(?:internal server error|bad gateway|service unavailable|gateway timeout).*)?|bad gateway[.!]?|gateway timeout[.!]?|internal server error[.!]?|service unavailable[.!]?)", 0.96),
-    ("missing_artifact", r"(?:error:\s*)?(?:missing (?:required )?artifact|(?:required )?artifact (?:is )?(?:missing|not found))(?:[.: ].*)?", 0.94),
+    ("timeout", r"(?:error:\s*)?(?:(?:request|connection|operation)\s+)?(?:timed?\s*out|timeout(?:error)?)(?::\s*upstream)?[.!]?", 0.95),
+    ("rate_limit", r"(?:error:\s*)?(?:rate[ -]limit(?:ed| exceeded)|too many requests|http(?: error)?\s*:?\s*429(?:\s+too many requests)?|429\s+too many requests)[.!]?", 0.96),
+    ("server_error", r"(?:error:\s*)?(?:(?:http(?: error)?|status(?: code)?)\s*[:=]?\s*5\d\d(?:\s+(?:internal server error|bad gateway|service unavailable|gateway timeout))?|5\d\d\s+(?:internal server error|bad gateway|service unavailable|gateway timeout)|bad gateway|gateway timeout|internal server error|service unavailable)[.!]?", 0.96),
+    ("missing_artifact", r"(?:error:\s*)?(?:missing (?:required )?artifact|(?:required )?artifact (?:is )?(?:missing|not found))(?::\s*[\w./\\-]+)?[.!]?", 0.94),
 )
 
 
@@ -39,27 +38,37 @@ def infra(record: Record) -> Finding | None:
     return None
 
 
-def judge_unstable(record: Record, peers: Sequence[Record]) -> Finding | None:
-    if record.score == 1 or record.judge_run is None:
-        return None
+def _judge_disagreement(peers: Sequence[Record]) -> dict | None:
+    """Summarize one identity group without enumerating judge pairs."""
     runs: dict[int, set[float]] = defaultdict(set)
     for peer in peers:
-        if peer.judge_key == record.judge_key and peer.judge_run is not None:
+        if peer.judge_run is not None:
             runs[peer.judge_run].add(peer.score)
     # Conflicting scores within a judge run do not establish independent judging.
     if any(len(scores) != 1 for scores in runs.values()):
         return None
     values = sorted((run, next(iter(scores))) for run, scores in runs.items())
-    pairs = list(combinations(values, 2))
-    flips = sum(left[1] != right[1] for left, right in pairs)
+    frequencies = Counter(score for _, score in values)
+    pairs = len(values) * (len(values) - 1) // 2
+    flips = pairs - sum(count * (count - 1) // 2 for count in frequencies.values())
     if not flips:
         return None
-    return Finding("judge_unstable", 0.99, {
-        "output_quote": record.output,
+    return {
         "judge_scores": [{"judge_run": run, "score": score} for run, score in values],
-        "different_score_pairs": flips, "judge_pairs": len(pairs),
-        "flip_rate": flips / len(pairs),
-    })
+        "different_score_pairs": flips, "judge_pairs": pairs,
+        "flip_rate": flips / pairs,
+    }
+
+
+def _judge_finding(record: Record, summary: dict | None) -> Finding | None:
+    if record.score == 1 or record.judge_run is None or summary is None:
+        return None
+    return Finding("judge_unstable", 0.99, {"output_quote": record.output, **summary})
+
+
+def judge_unstable(record: Record, peers: Sequence[Record]) -> Finding | None:
+    key = record.judge_key
+    return _judge_finding(record, _judge_disagreement([p for p in peers if p.judge_key == key]))
 
 
 def item_everyone_loses(record: Record, peers: Sequence[Record]) -> Finding | None:
@@ -92,7 +101,12 @@ def _normalize(text: str) -> str:
     return " ".join(text.casefold().split())
 
 
+NUMBER = r"(?<![\w.+-])[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?%?(?!\w|\.\d)"
+
+
 def _contains(text: str, term: str) -> bool:
+    if re.fullmatch(NUMBER, term):
+        return term.casefold() in {m.group().casefold() for m in re.finditer(NUMBER, text)}
     return re.search(r"(?<!\w)" + re.escape(_normalize(term)) + r"(?!\w)",
                      _normalize(text)) is not None
 
@@ -104,14 +118,14 @@ class HeuristicReasoner:
         # Ignore explanations/examples and rubric prose with no explicit requirement.
         if not re.match(r"^\s*(?:must\b|requires?\b|include\b|use\b|exactly\b)", rubric, re.I):
             return None
-        if re.search(r"\b(?:not|never|without|optional|example|such as|either|or)\b|\be\.g\.", rubric, re.I):
+        if re.search(r"\b(?:not|never|without|avoid\w*|omit\w*|exclud\w*|optional|examples?|such as|for instance|either|or)\b|\be\.g\.", rubric, re.I):
             return None
         terms: list[str] = []
         quoted = r'"([^"\n]+)"|“([^”\n]+)”|(?<!\w)\x27([^\x27\n]+)\x27'
         for match in re.finditer(quoted, rubric):
             terms.append(next(g for g in match.groups() if g is not None))
         rest = re.sub(quoted, " ", rubric)
-        terms.extend(m.group() for m in re.finditer(r"(?<![\w.])[+-]?\d+(?:\.\d+)?(?:%|\b)", rest))
+        terms.extend(m.group() for m in re.finditer(NUMBER, rest))
         # Small explicit unit vocabulary. Boundaries distinguish m from model, ms from mass.
         terms.extend(m.group() for m in re.finditer(
             r"(?<!\w)(?:kg|mg|km|cm|mm|ms|mL|kWh|Hz|MB|GB|°C|°F|seconds?|minutes?|hours?|kilograms?|meters?|liters?)(?!\w)", rest))
@@ -145,12 +159,13 @@ def triage(records: Sequence[Record], reasoner: Reasoner | None = None) -> list[
     for record in records:
         by_item[record.item_key].append(record)
         by_judge[record.judge_key].append(record)
+    judge_summaries = {key: _judge_disagreement(group) for key, group in by_judge.items()}
     verdicts = []
     for record in records:
         if record.score == 1:
             continue
         findings = [f for f in (
-            infra(record), judge_unstable(record, by_judge[record.judge_key]),
+            infra(record), _judge_finding(record, judge_summaries[record.judge_key]),
             item_everyone_loses(record, by_item[record.item_key]),
             unstated_requirement(record, reasoner),
         ) if f is not None]

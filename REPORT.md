@@ -2,15 +2,19 @@
 
 ## What works (with evidence)
 
-The local CLI reads generic JSONL and the documented Inspect v2 text JSON subset. It writes Markdown, JSON, and one static HTML file with class/model summaries and per-observation drill-down. Every verdict includes evidence and a fixed confidence. There are no third-party dependencies or LLM calls. Verification used Python 3.13.4 in this workspace.
+The dependency-free CLI reads generic JSONL and the documented Inspect v2 text JSON subset, renders JSON, Markdown and static HTML, exports human-labeling CSV, and calculates label metrics. The implementation remains offline and deterministic, with a small injectable `Reasoner` interface and no LLM calls.
 
-The generic fixture contains three tasks, three models, two judge runs, and two rubric items per task: 36 records. All four detectors fire, and six lost records use the default class. Negative controls explicitly assert that the formal greeting cases do not fire any detector. Tests also cover error discussion versus actual error-shaped output, changed judge identities, partial credit, missing judge IDs, quoted missing terms, input validation, CSV quoting, metric mistakes and overlaps, escaping, and repeatable CLI output.
+This fix round used Python 3.13.4. The full suite now has 45 passing tests: 33 existing tests and 12 review regression tests with subcases. All temporary test files were created under this working directory and removed by the tests. No packages were installed. No commits or pushes were attempted in this round.
 
-Actual command output, exit 0:
+Actual final command output, exit 0:
 
 ```text
-$ make test
+$ PYTHONDONTWRITEBYTECODE=1 make test
 python3 -m unittest discover -s tests -v
+test_all_score_mappings_account_for_order_and_collapse_strength (test_arena_hard.ArenaHardTests.test_all_score_mappings_account_for_order_and_collapse_strength) ... ok
+test_mismatched_published_prompt_is_rejected_instead_of_joined (test_arena_hard.ArenaHardTests.test_mismatched_published_prompt_is_rejected_instead_of_joined) ... ok
+test_real_reversal_fires_with_unchanged_generation_and_full_reasoning (test_arena_hard.ArenaHardTests.test_real_reversal_fires_with_unchanged_generation_and_full_reasoning) ... ok
+test_same_winner_after_swap_does_not_fabricate_instability (test_arena_hard.ArenaHardTests.test_same_winner_after_swap_does_not_fabricate_instability) ... ok
 test_abstain_on_single_model_partial_credit_or_changed_rubric (test_detectors.EveryoneTests.test_abstain_on_single_model_partial_credit_or_changed_rubric) ... ok
 test_zero_across_models_and_runs (test_detectors.EveryoneTests.test_zero_across_models_and_runs) ... ok
 test_error_discussion_is_not_infrastructure_failure (test_detectors.InfraTests.test_error_discussion_is_not_infrastructure_failure) ... ok
@@ -32,6 +36,18 @@ test_message_input_text_blocks_completion_and_score_metadata (test_inputs.Inspec
 test_missing_judge_run_is_not_inferred_from_epoch (test_inputs.InspectTests.test_missing_judge_run_is_not_inferred_from_epoch) ... ok
 test_reject_unsupported_instead_of_faking_scores_or_text (test_inputs.InspectTests.test_reject_unsupported_instead_of_faking_scores_or_text) ... ok
 test_unscored_sample_warning_and_sample_error (test_inputs.InspectTests.test_unscored_sample_warning_and_sample_error) ... ok
+test_1_explanations_and_bare_numbers_are_not_infra (test_review_round1.ReviewRound1Tests.test_1_explanations_and_bare_numbers_are_not_infra) ... ok
+test_2_safe_csv_cells_retain_original_record (test_review_round1.ReviewRound1Tests.test_2_safe_csv_cells_retain_original_record) ... ok
+test_3_csv_errors_have_path_line_and_status_2 (test_review_round1.ReviewRound1Tests.test_3_csv_errors_have_path_line_and_status_2) ... ok
+test_3_writer_long_answer_can_be_scored (test_review_round1.ReviewRound1Tests.test_3_writer_long_answer_can_be_scored) ... ok
+test_4_tool_only_choices_rejected_with_serialized_completion (test_review_round1.ReviewRound1Tests.test_4_tool_only_choices_rejected_with_serialized_completion) ... ok
+test_5_generic_extra_inspect_fields_are_ignored (test_review_round1.ReviewRound1Tests.test_5_generic_extra_inspect_fields_are_ignored) ... ok
+test_5_jsonl_only_splits_on_newlines (test_review_round1.ReviewRound1Tests.test_5_jsonl_only_splits_on_newlines) ... ok
+test_6_judge_groups_are_scanned_once (test_review_round1.ReviewRound1Tests.test_6_judge_groups_are_scanned_once) ... ok
+test_7_complete_numeric_tokens (test_review_round1.ReviewRound1Tests.test_7_complete_numeric_tokens) ... ok
+test_7_prohibitions_and_examples_abstain (test_review_round1.ReviewRound1Tests.test_7_prohibitions_and_examples_abstain) ... ok
+test_8_mit_license_and_metadata (test_review_round1.ReviewRound1Tests.test_8_mit_license_and_metadata) ... ok
+test_9_oversized_integer_is_contextual_status_2 (test_review_round1.ReviewRound1Tests.test_9_oversized_integer_is_contextual_status_2) ... ok
 test_precision_recall_with_false_positives_false_negatives_and_overlap (test_workflow.LabelTests.test_precision_recall_with_false_positives_false_negatives_and_overlap) ... ok
 test_reject_invalid_labels_duplicate_ids_and_inconsistent_predictions (test_workflow.LabelTests.test_reject_invalid_labels_duplicate_ids_and_inconsistent_predictions) ... ok
 test_template_preserves_text_and_blanks (test_workflow.LabelTests.test_template_preserves_text_and_blanks) ... ok
@@ -42,157 +58,86 @@ test_html_is_self_contained_and_escapes_untrusted_text (test_workflow.WorkflowTe
 test_partial_loss_and_all_pass_model (test_workflow.WorkflowTests.test_partial_loss_and_all_pass_model) ... ok
 
 ----------------------------------------------------------------------
-Ran 29 tests in 0.249s
+Ran 45 tests in 0.356s
 
 OK
 ```
 
-Actual demo and CSV template command output, both exit 0:
+The existing end-to-end tests run report, label and score as subprocesses, check the synthetic verdict counts, and compare report bytes across repeated runs. They also verify HTML escaping, blank-label handling, overlapping detector metrics, input validation, Inspect mappings and public-data adapter behavior. The seven temporary-directory tests reported as blocked by the reviewer passed here.
+
+## Review round 1
+
+I reproduced every finding with `tests/test_review_round1.py` before changing production code. I saw each finding's regression fail against the old implementation. Some tests contain multiple subcases, so the failure count exceeds the test count. The first run exited 1; its actual summary was:
 
 ```text
-$ make demo
-python3 -m blame_cli report fixtures/synthetic.jsonl --out demo
-Wrote demo/report.md, report.json, report.html (21 lost items)
-python3 -m blame_cli report fixtures/inspect.json --out demo-inspect
-Wrote demo-inspect/report.md, report.json, report.html (2 lost items)
-$ ./blame label fixtures/synthetic.jsonl --out labels.csv
-Wrote labels.csv (21 rows; human_label is blank)
+$ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_review_round1.py -v
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.135s
+
+FAILED (failures=36, errors=4)
 ```
 
-`./blame score labels.csv` returned exit 0, with 0 labeled rows and 21 unlabeled rows. All precision/recall values were null, as expected for an untouched template. The template does not present predicted labels as human truth.
+The full initial failure output and intermediate runs are retained locally under `validation/review-round1/` (gitignored). Each numbered item below corresponds to the review finding. All named regressions pass in the final suite above; none of the findings was rebutted.
 
-For a separate arithmetic check, `validation/synthetic-labels.csv` contains five manually constructed rows, not human annotations: one infra true positive, two infra false positives, one infra false negative, an overlapping unstated-requirement match, and one blank human label. The full real command output below demonstrates the calculation, not measured detector quality on real data. Exit 0:
+1. **Ordinary answers blamed on infrastructure.** `test_1_explanations_and_bare_numbers_are_not_infra` reproduced `infra` verdicts for the reported `429`, `500`, timeout explanation and rate-limit explanation, plus other trailing prose. I saw these subcases fail before the fix. The text rules now require whole failure phrases, explicit HTTP/status context for otherwise bare codes, and narrowly constrained suffixes. Bare numeric answers and explanatory prose use the default verdict; a repeated-judge disagreement on output `429` is now visible. Existing positive examples still pass. A standalone failure phrase remains inherently ambiguous, and an explicit error field still takes precedence by contract.
+
+2. **Spreadsheet formula prefixes.** `test_2_safe_csv_cells_retain_original_record` reproduced unchanged formula prefixes in every user-controlled display field, starting with `=1+1`. I saw the escaping assertion fail before the fix. The writer now prefixes risky cells with an apostrophe, including `=`, `+`, `-`, `@`, leading whitespace before those characters, and leading tab/CR/LF. A separate `original_record_json` column retains the entire exact record as inert JSON; tests deserialize it and compare all fields. Stable IDs and blank human labels are unchanged, and `score` accepts the export. This verifies emitted CSV bytes and round-trip preservation, not execution in a spreadsheet application.
+
+3. **CSV writer/reader size mismatch and uncaught parser errors.** `test_3_writer_long_answer_can_be_scored` reproduced exit 1 with `_csv.Error: field larger than field limit (131072)` for an exported 131,073-character output. I saw that regression fail before the fix. Reading now temporarily sets the field limit to `sys.maxsize`, matching Python's string size policy, then restores the previous process setting. Memory remains the practical limit. The long export scores successfully. `test_3_csv_errors_have_path_line_and_status_2` also failed before the fix because malformed CSV lacked path context. Strict parsing now converts `csv.Error` into `ValueError` with the path and physical line; the existing CLI returns status 2 without a traceback. The unterminated second-line field is reported as CSV line 2.
+
+4. **Inspect tool-only bypass through completion.** `test_4_tool_only_choices_rejected_with_serialized_completion` reproduced acceptance of tool-only choices with empty, whitespace and nonempty serialized completions. I saw those subcases fail before the fix. Choices are now checked independently before selecting completion text. Any tool-only choice is rejected with the explicit generic-export guidance; the absent-completion negative case still rejects, and ordinary text completions still pass the existing tests.
+
+5. **Generic format detection and Unicode separators.** Both `test_5_generic_extra_inspect_fields_are_ignored` and `test_5_jsonl_only_splits_on_newlines` errored before the fix. The former reproduced Inspect sniffing on valid generic records with extra `eval`/`samples` fields. The latter reproduced JSON string splitting at U+2028. Generic records identified by their `task_id` now take precedence over Inspect sniffing, with normal validation still applied. JSONL splits on actual LF delimiters, accepts CRLF, and preserves U+2028, U+2029 and U+0085 inside strings. These are synthetic input files, not personal data.
+
+6. **Cubic repeated-judge analysis.** `test_6_judge_groups_are_scanned_once` failed before the fix: 40 identical-score judges caused 3,280 identity reads, exceeding the regression bound of 160; mixed scores caused 2,470. Disagreement now counts distinct judge runs by score once per identity group. Unequal pairs equal all unordered pairs minus equal-score pairs from frequency counts. The summary is reused for all lost observations, without materializing pairs. Tests cover agreement and fractional-score disagreement, and existing tests retain duplicate-run and identity-boundary checks.
+
+   I also ran the reviewer's timing workload before and after the fix. Actual outputs in seconds on this machine:
 
 ```text
-$ ./blame score validation/synthetic-labels.csv
-{
-  "labeled_rows": 4,
-  "unlabeled_rows": 1,
-  "note": "Blank human labels excluded; undefined precision/recall is null. Counts are per scored observation. Synthetic labels do not establish real precision.",
-  "per_detector": {
-    "infra": {
-      "tp": 1,
-      "fp": 2,
-      "fn": 1,
-      "support": 2,
-      "precision": 0.3333333333333333,
-      "recall": 0.5
-    },
-    "judge_unstable": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 0,
-      "support": 0,
-      "precision": null,
-      "recall": null
-    },
-    "item_everyone_loses": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 0,
-      "support": 0,
-      "precision": null,
-      "recall": null
-    },
-    "unstated_requirement": {
-      "tp": 1,
-      "fp": 0,
-      "fn": 0,
-      "support": 1,
-      "precision": 1.0,
-      "recall": 1.0
-    },
-    "genuine_failure": {
-      "tp": 0,
-      "fp": 1,
-      "fn": 1,
-      "support": 1,
-      "precision": 0.0,
-      "recall": 0.0
-    }
-  },
-  "per_verdict": {
-    "infra": {
-      "tp": 1,
-      "fp": 2,
-      "fn": 1,
-      "support": 2,
-      "precision": 0.3333333333333333,
-      "recall": 0.5
-    },
-    "judge_unstable": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 0,
-      "support": 0,
-      "precision": null,
-      "recall": null
-    },
-    "item_everyone_loses": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 0,
-      "support": 0,
-      "precision": null,
-      "recall": null
-    },
-    "unstated_requirement": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 1,
-      "support": 1,
-      "precision": null,
-      "recall": 0.0
-    },
-    "genuine_failure": {
-      "tp": 0,
-      "fp": 1,
-      "fn": 1,
-      "support": 1,
-      "precision": 0.0,
-      "recall": 0.0
-    }
-  }
-}
+Before:
+200 identical-score judges: 0.24 seconds
+400 identical-score judges: 2.066 seconds
+800 identical-score judges: 15.929 seconds
+After:
+200 identical-score judges: 0.006 seconds
+400 identical-score judges: 0.015 seconds
+800 identical-score judges: 0.051 seconds
 ```
 
-Artifact checks parsed both JSON reports, checked class/model counts against the drill-down, checked the generated file names, and compared the README excerpt with the actual Markdown. Actual verification output:
+   The command used for both measurements was:
 
-```text
-demo: 3 report files; 36 scored observations; 21 lost items; 21 lost points
-demo-inspect: 3 report files; 2 scored observations; 2 lost items; 1.5 lost points
-README excerpt matches the generated report; no em dashes in README.
+```sh
+python3 -B -c 'from time import perf_counter; from blame_cli.model import Record; from blame_cli.detectors import triage
+for n in (200,400,800):
+ records=[Record("t","m","r","Answer.","i","Be correct.","wrong",0,"Wrong.",j) for j in range(n)]
+ start=perf_counter(); triage(records); print(n,"identical-score judges:",round(perf_counter()-start,3),"seconds")'
 ```
 
-The HTML parser test verifies two summary tables, one details block per tested lost observation, escaped script text, and no external asset attributes. End-to-end tests compare report bytes across repeated runs.
+   These are observations, not timing assertions. The full triage pipeline is not claimed to be linear: cohort scans remain per observation, and copying per-judge evidence into each verdict can require quadratic output size when judges disagree.
+
+7. **Missing-requirement boundaries and abstentions.** `test_7_complete_numeric_tokens` reproduced treating `12` as present inside `12.5`; signed and percent subcases also failed. `test_7_prohibitions_and_examples_abstain` reproduced treating `avoid` and plural `examples` as positive requirements. I saw both regressions fail before the fix. Extraction and presence checks now share complete numeric-token syntax, including signs, decimals, exponents and percent suffixes. Prohibition words (`avoid`, `omit`, `exclude`), plural examples and `for instance` now conservatively cause abstention. Exact numeric presence and the existing quoted-string, unit, entity, negation and alternative tests still pass. This remains literal matching, not semantic inference.
+
+8. **Missing release license.** `test_8_mit_license_and_metadata` failed before the fix because the repository root had no LICENSE. Added the requested MIT license with `Copyright (c) 2026 Hari Naralasetty`, a README licensing section, and `pyproject.toml` metadata with `license = "MIT"`, `license-files = ["LICENSE"]`, author, Python requirement and no dependencies. The regression checks the license grant, attribution and parsed metadata. Existing public-data licensing remains separate. Package building or publication was not requested or tested.
+
+9. **Oversized integer score crash.** `test_9_oversized_integer_is_contextual_status_2` reproduced an uncaught `OverflowError` and exit 1 for `10**400`. I saw that assertion fail before the fix. The range check now runs before `math.isfinite`, so out-of-range integers are rejected before float conversion. The CLI regression verifies status 2, path plus line 1, the score-validation message, no traceback and no report output.
 
 ## What is heuristic/faked
 
-All task, model, output and score data in the fixtures is invented. `fixtures/inspect.json` was hand-written from the official Inspect field references linked in README. It was not emitted or validated by an installed Inspect package. No `inspect_ai` dependency was installed.
+The new regressions use synthetic records only. Existing fixtures are invented; the hand-written Inspect fixture was not validated by an installed `inspect_ai`. Public-data adapter tests use the existing public Arena-Hard inputs; attribution and limitations remain in `realdata/`.
 
-Infrastructure matching uses one table of strict text patterns. The missing-requirement detector uses literal anchors and limited name/unit extraction, with word overlap for the closest sentence. It misses uncertain names and semantic equivalents; it can flag a number that was implied by an instruction. Missing literal text is evidence to review, not proof that a requirement is unfair. `Reasoner` is an injection point; the shipped implementation is deterministic.
-
-The everyone-loses class describes only the supplied cohort. Judge flip rates measure score disagreements among distinct explicit judge runs, including fractional scores. Confidence values are fixed strengths without statistical calibration. `genuine_failure` is the required fallback and does not prove model responsibility. Repeated judges count as separate scored observations in summaries and metrics.
+Infrastructure matching, requirement anchors and fixed confidence values are heuristics. An empty output or supplied error field is still treated as infrastructure evidence. The requirement reasoner deliberately abstains on supported prohibition/example constructions and cannot resolve all English phrasing, implied requirements or semantic equivalents. `genuine_failure` is the default when no detector fires and does not establish model responsibility. Judge disagreements and cohort-wide zeros describe supplied observations, not proof of a faulty evaluation.
 
 ## What failed or is flaky
 
-An early detector test found that an alternation guard did not abstain on `Include "hello" or "hi".`. The word-boundary pattern was corrected; the final test output above includes that passing negative case. No test failures remained in the final run. No flaky behavior was observed in these runs.
+The initial regression failures were expected reproductions and are recorded above. An intermediate implementation reported an unterminated CSV field at line 1 because `DictReader.line_num` was stale when parsing raised; this was corrected to use the underlying CSV reader's consumed physical line count. The final malformed-CSV regression verifies line 2. No failures remained in the final full suite and no flaky behavior was observed. Benchmark times depend on the machine; the regression uses operation counts instead of elapsed time.
 
-The required milestone commit could not be created. The workspace permission profile makes `.git` read-only, so staging failed before the commit could run. Actual output from the attempted staging command, exit 128:
-
-```text
-$ git add .gitignore Makefile blame blame_cli fixtures tests
-fatal: Unable to create '/Users/harinaralasetty/Development Work/blame/.git/index.lock': Operation not permitted
-```
-
-All implementation files remain in the current working directory and are uncommitted. Nothing was pushed. No files outside the working directory were read or written by shell commands, and no environment files or shared Python environments were used.
-
-Verification ran on Python 3.13.4; compatibility with 3.11 is based on the language features used, not a separate interpreter run. HTML was checked structurally, without a browser rendering check. Binary Inspect logs, multimodal content, unresolved attachments, header-only logs, invalidated samples and ambiguous score encodings are intentionally unsupported and produce errors. Samples without scores produce warnings and are omitted rather than assigned invented zero scores.
+Spreadsheet escaping was verified as serialized data, without opening Excel or LibreOffice; saving through another application can change its escaping. CSV fields and reports remain memory-bound. Python 3.11 compatibility follows from the standard-library APIs and syntax used; only Python 3.13.4 was run here. No real Inspect installation, package build, publication or new human-label study was performed.
 
 ## Next steps
 
-Collect independent human labels using the CSV template before publishing detector precision. Validate the adapter against a real public Inspect text JSON export. When this workspace permits Git writes, create the requested milestone commit. No further implementation is needed for the stated acceptance checks.
+The reviewer can inspect and commit these changes. Independent human labeling and a real public Inspect text export remain useful validation work outside this fix round. No further implementation is needed for these nine findings.
 
 ## Verdict
 
-The requested local CLI and fixture acceptance checks pass: `make test` passes 29 tests, and `make demo` creates all three report formats for both inputs. The reports expose the evidence, counts, uncertainty, and overlapping detector matches, and the labeling workflow calculates precision/recall without treating predictions as ground truth. This is a deterministic triage aid with documented heuristic limits, not an adjudicator of model fault. Real-data precision and actual Inspect-export compatibility remain unmeasured. The only unmet workflow requirement is committing the work, which the read-only Git permission prevented.
+All nine review findings were reproduced and fixed with regressions observed failing before the fixes. The final `make test` run passes all 45 tests, including the previously blocked temporary-directory workflows. The CLI now avoids the reported false infrastructure verdicts, exports escaped spreadsheet cells with exact originals retained, handles long and malformed CSV, rejects tool-only Inspect output consistently, preserves valid generic JSONL, reuses judge disagreement counts, respects the tested requirement boundaries, validates huge scores safely, and includes the requested MIT license and metadata. This supports release as a small offline triage utility with documented heuristic limits; it does not establish real-world detector precision. Changes are uncommitted as requested.

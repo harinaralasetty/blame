@@ -77,19 +77,21 @@ def inspect_records(log: dict) -> tuple[list[Record], list[str]]:
         else:
             instruction = _text(sample_input)
         output = _object(sample.get("output") or {}, "sample.output")
+        choices = output.get("choices", [])
+        if not isinstance(choices, list):
+            raise ValueError("output.choices must be a list")
+        choice_text = ""
+        for index, choice in enumerate(choices):
+            message = _object(_object(choice, "choice").get("message"), "choice.message")
+            text = _text(message.get("content", ""))
+            if not text.strip() and message.get("tool_calls"):
+                raise ValueError("tool-only outputs require an explicit generic text export")
+            if index == 0:
+                choice_text = text
         if isinstance(output.get("completion"), str):
             completion = _text(output["completion"])
         else:
-            choices = output.get("choices", [])
-            if not isinstance(choices, list):
-                raise ValueError("output.choices must be a list")
-            if choices:
-                message = _object(_object(choices[0], "choice").get("message"), "choice.message")
-                completion = _text(message.get("content", ""))
-                if not completion.strip() and message.get("tool_calls"):
-                    raise ValueError("tool-only outputs require an explicit generic text export")
-            else:
-                completion = ""
+            completion = choice_text
         error = sample.get("error")
         if error is not None:
             error = _object(error, "sample.error").get("message")
@@ -132,12 +134,14 @@ def load_inputs(paths: Iterable[str]) -> tuple[list[Record], list[str]]:
                 whole = json.loads(content)
             except json.JSONDecodeError:
                 whole = None
-            if isinstance(whole, dict) and ("eval" in whole or "samples" in whole):
+            # Generic fields win over unknown extras, even Inspect-shaped extras.
+            generic = isinstance(whole, dict) and "task_id" in whole
+            if isinstance(whole, dict) and not generic and ("eval" in whole or "samples" in whole):
                 loaded, notes = inspect_records(whole)
                 warnings.extend(f"{path}: {note}" for note in notes)
             else:
                 loaded = []
-                for number, line in enumerate(content.splitlines(), 1):
+                for number, line in enumerate(content.split("\n"), 1):
                     if not line.strip():
                         continue
                     try:
