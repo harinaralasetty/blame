@@ -80,7 +80,19 @@ The heuristic reasoner checks explicit requirement wording (`must`, `require`, `
 
 Precedence is infra, judge instability, everyone loses, unstated requirement, then genuine failure. JSON and HTML retain all detector matches. Confidence values are fixed evidence strengths, not calibrated probabilities: 0.94-0.99 for infra depending on the rule, 0.99 for observed judge disagreement, 0.90 for cohort zeros, 0.65 for missing literal anchors, and 0.50 for the default. Genuine failure means no detector fired; it is not proof that the model failed.
 
-## Real demo excerpt
+## Published public-data run
+
+[Arena-Hard findings](realdata/FINDINGS.md): 3,000 published judge observations
+across 500 prompts and three candidate models. Preferences changed across answer-order
+swaps in 500 of 1,500 answer pairs; 34 prompts had all supplied candidates lose to
+the fixed baseline. Twenty fired verdicts were checked by Codex: 12/12 disagreement
+flags and 8/8 cohort-loss flags matched their documented predicates. These numbers
+measure evidence fidelity on a small sample, not accuracy of eval-fault attribution.
+The findings include quoted source examples, licenses, limitations and reproduction
+commands. Downloads and full reports stay in gitignored `data/`; reduced reports
+and audit records are under `realdata/`.
+
+## Synthetic demo excerpt
 
 Trimmed from `demo/report.md` after running `make demo`:
 

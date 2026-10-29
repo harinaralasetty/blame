@@ -1,0 +1,71 @@
+{
+  "dataset": "lmarena-ai/arena-hard-auto / arena-hard-v0.1",
+  "revision": "15f3746e21432264ce9b453999bde4f3c946d2e6",
+  "license": "Apache-2.0 (dataset card)",
+  "judge": "gpt-4-1106-preview",
+  "baseline": "gpt-4-0314",
+  "models": [
+    "claude-3-opus-20240229",
+    "gpt-3.5-turbo-0125",
+    "llama-3-70b-instruct"
+  ],
+  "prompts": 500,
+  "records": 3000,
+  "generic_sha256": "b50c2bff485cb43aa0b4f37312023f4359d6a44157ca1f3cf15b28d857dfe605",
+  "files": [
+    {
+      "path": "README.md",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/README.md",
+      "bytes": 1038,
+      "sha256": "eec51f34b1f6df6695960877bb3e6020cc52f460aa84274c62b7a695b92f7c00"
+    },
+    {
+      "path": "data/arena-hard-v0.1/question.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/question.jsonl",
+      "bytes": 282575,
+      "sha256": "7ed52dc0ffea3ddc5a44393658d30288e11ce5307da981e0a010170b3c3037ce"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_answer/gpt-4-0314.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_answer/gpt-4-0314.jsonl",
+      "bytes": 1270631,
+      "sha256": "0f6abc84de4600fde987d9db70f838f4ecdbd27a2f1f4058c12aa322a6f791b2"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_answer/claude-3-opus-20240229.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_answer/claude-3-opus-20240229.jsonl",
+      "bytes": 1553155,
+      "sha256": "ef342f26a4527df1a31f38bbd73d44a4a630bd6ae1a48e5f0a77023749febf90"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_answer/gpt-3.5-turbo-0125.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_answer/gpt-3.5-turbo-0125.jsonl",
+      "bytes": 1070610,
+      "sha256": "5cfec14570206ec251c3506d36951db87ca869757be75d6075a20120c3cbb616"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_answer/llama-3-70b-instruct.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_answer/llama-3-70b-instruct.jsonl",
+      "bytes": 1637528,
+      "sha256": "a547dd77953fc79a896d5a88af499333c254910c5897d4c138de8b65ea44c744"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_judgment/gpt-4-1106-preview/claude-3-opus-20240229.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_judgment/gpt-4-1106-preview/claude-3-opus-20240229.jsonl",
+      "bytes": 8283106,
+      "sha256": "ba410f24795fd5b7a075f695044b6d03376d4b66e0f0644dc22189ff052afdb0"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_judgment/gpt-4-1106-preview/gpt-3.5-turbo-0125.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_judgment/gpt-4-1106-preview/gpt-3.5-turbo-0125.jsonl",
+      "bytes": 7171709,
+      "sha256": "966426946ebc4aa6c7411d28d68068213aede3b9c38ca5d71a8af0fce9441ce5"
+    },
+    {
+      "path": "data/arena-hard-v0.1/model_judgment/gpt-4-1106-preview/llama-3-70b-instruct.jsonl",
+      "url": "https://huggingface.co/datasets/lmarena-ai/arena-hard-auto/resolve/15f3746e21432264ce9b453999bde4f3c946d2e6/data/arena-hard-v0.1/model_judgment/gpt-4-1106-preview/llama-3-70b-instruct.jsonl",
+      "bytes": 8490033,
+      "sha256": "8b059f754624ac65565e858e35d49bcdb5e40b3cd389df6ca00b4f6becab3b47"
+    }
+  ]
+}
