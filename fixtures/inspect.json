@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "eval_id": "synthetic-inspect-eval",
+    "run_id": "inspect-generation-1",
+    "created": "2026-01-01T00:00:00Z",
+    "task": "color",
+    "task_id": "synthetic-color-task",
+    "task_version": 1,
+    "dataset": {"samples": 1, "shuffled": false},
+    "model": "synthetic/alpha",
+    "model_generate_config": {},
+    "config": {},
+    "packages": {},
+    "metadata": {"fixture": "Hand-written from documented Inspect v2 fields; never executed by inspect_ai."}
+  },
+  "plan": {"name": "synthetic-plan", "steps": [], "config": {}},
+  "stats": {"started_at": "2026-01-01T00:00:00Z", "completed_at": "2026-01-01T00:00:01Z", "model_usage": {}},
+  "samples": [
+    {
+      "id": "sample",
+      "epoch": 1,
+      "input": "Answer with the word blue. Explain briefly.",
+      "target": "blue",
+      "metadata": {"judge_run": 1},
+      "messages": [],
+      "output": {
+        "model": "synthetic/alpha",
+        "choices": [{"message": {"role": "assistant", "content": "Green is my choice."}, "stop_reason": "stop"}]
+      },
+      "scores": {
+        "blue": {
+          "value": "I",
+          "explanation": "The response says green rather than blue.",
+          "metadata": {"rubric_item_text": "Must include \"blue\"."}
+        },
+        "explain": {
+          "value": 0.5,
+          "explanation": "The explanation is incomplete.",
+          "metadata": {"rubric_item_text": "Explain briefly."}
+        }
+      }
+    }
+  ]
+}
