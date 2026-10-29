@@ -6,3 +6,6 @@ demo-inspect/
 labels.csv
 validation/
 data/
+build/
+dist/
+*.egg-info/

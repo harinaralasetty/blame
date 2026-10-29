@@ -1,15 +1,71 @@
-# Implementation report
+# Public release preparation
 
 ## What works (with evidence)
 
-The dependency-free CLI reads generic JSONL and the documented Inspect v2 text JSON subset, renders JSON, Markdown and static HTML, exports human-labeling CSV, and calculates label metrics. The implementation remains offline and deterministic, with a small injectable `Reasoner` interface and no LLM calls.
+The README now leads with the published Arena-Hard finding: changed preferences in 500 of 1,500 answer pairs (33.3%), including 268 outright winner reversals and 232 tie/win/loss changes. Its regex example quotes the findings verbatim and includes the candidate's real defect. The detailed command, input and detector reference is preserved in [docs/reference.md](docs/reference.md).
 
-This fix round used Python 3.13.4. The full suite now has 45 passing tests: 33 existing tests and 12 review regression tests with subcases. All temporary test files were created under this working directory and removed by the tests. No packages were installed. No commits or pushes were attempted in this round.
+[docs/report.html](docs/report.html) is a 15,266-byte static preview generated with the existing renderer from `realdata/arena_hard/report.json`. It preserves all full-run aggregate tables and the complete audited regex item (sample 4). It explicitly marks 1,825 of 1,826 lost observations as omitted. Source attribution, the Apache-2.0 data license and the meaning of preference units appear in the preview. No screenshot is needed.
+
+`pyproject.toml` now declares the `blame = "blame_cli.cli:main"` console script, a setuptools build backend and explicit package selection. Runtime dependencies remain empty. Build artifacts are gitignored. The README explains the sole build dependency, `setuptools>=77`.
+
+### Fresh-venv quickstart
+
+Verified on Python 3.13.4 in a newly created temporary directory under this checkout's gitignored `validation/release/`. Copied only the package, fixtures, README, LICENSE and pyproject, then ran the README's exact three commands in that directory. Used its local `.venv`, a local temporary/build directory and local pip cache, with the public PyPI index and no inherited Python import path. No packages were installed globally.
+
+Selected actual output, all three commands exited 0 (pip progress and temporary paths omitted):
+
+```text
+$ python3 -m venv .venv
+$ .venv/bin/python -m pip install .
+Successfully built blame-cli
+Installing collected packages: blame-cli
+Successfully installed blame-cli-0.1.0
+$ .venv/bin/blame report fixtures/synthetic.jsonl --out demo
+Wrote demo/report.md, report.json, report.html (21 lost items)
+```
+
+An additional installed-package smoke check ran from an empty `away/` directory to rule out importing the source checkout. Actual output:
+
+```text
+Installed distribution: 0.1.0
+Runtime dependencies: None
+Module installed in venv: True
+Quickstart verified: 36 observations, 21 losses; all three report formats exist.
+```
+
+Full local install output is retained in `validation/release/quickstart.txt` (gitignored).
+
+### Release content checks
+
+A standard-library HTML parser and assertions checked source tables, the unchanged example output and judge reasoning, local links, excerpt disclosure, the console entry point, README quotes, post length and the CI matrix. Actual output:
+
+```text
+Preview: 15,266 bytes; full-run tables match source; one unchanged audited item; all local links resolve; no scripts or external assets.
+Copy: README lead and quotes match FINDINGS.md; no em dashes; LinkedIn post 1109 characters and ends with a question.
+Release files: Markdown links resolve; blame entry point and Python 3.11-3.13 make test matrix present. Workflow not executed here.
+```
+
+[docs/linkedin_draft.md](docs/linkedin_draft.md) contains the 1,109-character post, including newlines, with one hashtag, a question at the end, and a separate first-comment draft for the repo link. The post count excludes headings, the first comment and the editor note.
+
+### PyPI name check
+
+Checked the official PyPI JSON endpoints on 2026-10-29, using both the web tool and curl. Actual curl output:
+
+```text
+blame: HTTP 200
+eval-blame: HTTP 404
+blame-evals: HTTP 404
+eval-loss-triage: HTTP 404
+```
+
+[`blame`](https://pypi.org/project/blame/) is already registered to another project, version 0.0.1, described as "Development experience insights". Three proposed distribution names had no registered project at check time: [`eval-blame`](https://pypi.org/pypi/eval-blame/json), [`blame-evals`](https://pypi.org/pypi/blame-evals/json), and [`eval-loss-triage`](https://pypi.org/pypi/eval-loss-triage/json). A 404 does not reserve a name or guarantee PyPI will accept registration. The existing local distribution name `blame-cli` is unchanged and was not claimed available for publication. The command stays `blame`. Nothing was published.
+
+### Test suite
 
 Actual final command output, exit 0:
 
 ```text
-$ PYTHONDONTWRITEBYTECODE=1 make test
+$ make test
 python3 -m unittest discover -s tests -v
 test_all_score_mappings_account_for_order_and_collapse_strength (test_arena_hard.ArenaHardTests.test_all_score_mappings_account_for_order_and_collapse_strength) ... ok
 test_mismatched_published_prompt_is_rejected_instead_of_joined (test_arena_hard.ArenaHardTests.test_mismatched_published_prompt_is_rejected_instead_of_joined) ... ok
@@ -58,86 +114,35 @@ test_html_is_self_contained_and_escapes_untrusted_text (test_workflow.WorkflowTe
 test_partial_loss_and_all_pass_model (test_workflow.WorkflowTests.test_partial_loss_and_all_pass_model) ... ok
 
 ----------------------------------------------------------------------
-Ran 45 tests in 0.356s
+Ran 45 tests in 0.358s
 
 OK
 ```
 
-The existing end-to-end tests run report, label and score as subprocesses, check the synthetic verdict counts, and compare report bytes across repeated runs. They also verify HTML escaping, blank-label handling, overlapping detector metrics, input validation, Inspect mappings and public-data adapter behavior. The seven temporary-directory tests reported as blocked by the reviewer passed here.
-
-## Review round 1
-
-I reproduced every finding with `tests/test_review_round1.py` before changing production code. I saw each finding's regression fail against the old implementation. Some tests contain multiple subcases, so the failure count exceeds the test count. The first run exited 1; its actual summary was:
-
-```text
-$ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_review_round1.py -v
-
-----------------------------------------------------------------------
-Ran 12 tests in 0.135s
-
-FAILED (failures=36, errors=4)
-```
-
-The full initial failure output and intermediate runs are retained locally under `validation/review-round1/` (gitignored). Each numbered item below corresponds to the review finding. All named regressions pass in the final suite above; none of the findings was rebutted.
-
-1. **Ordinary answers blamed on infrastructure.** `test_1_explanations_and_bare_numbers_are_not_infra` reproduced `infra` verdicts for the reported `429`, `500`, timeout explanation and rate-limit explanation, plus other trailing prose. I saw these subcases fail before the fix. The text rules now require whole failure phrases, explicit HTTP/status context for otherwise bare codes, and narrowly constrained suffixes. Bare numeric answers and explanatory prose use the default verdict; a repeated-judge disagreement on output `429` is now visible. Existing positive examples still pass. A standalone failure phrase remains inherently ambiguous, and an explicit error field still takes precedence by contract.
-
-2. **Spreadsheet formula prefixes.** `test_2_safe_csv_cells_retain_original_record` reproduced unchanged formula prefixes in every user-controlled display field, starting with `=1+1`. I saw the escaping assertion fail before the fix. The writer now prefixes risky cells with an apostrophe, including `=`, `+`, `-`, `@`, leading whitespace before those characters, and leading tab/CR/LF. A separate `original_record_json` column retains the entire exact record as inert JSON; tests deserialize it and compare all fields. Stable IDs and blank human labels are unchanged, and `score` accepts the export. This verifies emitted CSV bytes and round-trip preservation, not execution in a spreadsheet application.
-
-3. **CSV writer/reader size mismatch and uncaught parser errors.** `test_3_writer_long_answer_can_be_scored` reproduced exit 1 with `_csv.Error: field larger than field limit (131072)` for an exported 131,073-character output. I saw that regression fail before the fix. Reading now temporarily sets the field limit to `sys.maxsize`, matching Python's string size policy, then restores the previous process setting. Memory remains the practical limit. The long export scores successfully. `test_3_csv_errors_have_path_line_and_status_2` also failed before the fix because malformed CSV lacked path context. Strict parsing now converts `csv.Error` into `ValueError` with the path and physical line; the existing CLI returns status 2 without a traceback. The unterminated second-line field is reported as CSV line 2.
-
-4. **Inspect tool-only bypass through completion.** `test_4_tool_only_choices_rejected_with_serialized_completion` reproduced acceptance of tool-only choices with empty, whitespace and nonempty serialized completions. I saw those subcases fail before the fix. Choices are now checked independently before selecting completion text. Any tool-only choice is rejected with the explicit generic-export guidance; the absent-completion negative case still rejects, and ordinary text completions still pass the existing tests.
-
-5. **Generic format detection and Unicode separators.** Both `test_5_generic_extra_inspect_fields_are_ignored` and `test_5_jsonl_only_splits_on_newlines` errored before the fix. The former reproduced Inspect sniffing on valid generic records with extra `eval`/`samples` fields. The latter reproduced JSON string splitting at U+2028. Generic records identified by their `task_id` now take precedence over Inspect sniffing, with normal validation still applied. JSONL splits on actual LF delimiters, accepts CRLF, and preserves U+2028, U+2029 and U+0085 inside strings. These are synthetic input files, not personal data.
-
-6. **Cubic repeated-judge analysis.** `test_6_judge_groups_are_scanned_once` failed before the fix: 40 identical-score judges caused 3,280 identity reads, exceeding the regression bound of 160; mixed scores caused 2,470. Disagreement now counts distinct judge runs by score once per identity group. Unequal pairs equal all unordered pairs minus equal-score pairs from frequency counts. The summary is reused for all lost observations, without materializing pairs. Tests cover agreement and fractional-score disagreement, and existing tests retain duplicate-run and identity-boundary checks.
-
-   I also ran the reviewer's timing workload before and after the fix. Actual outputs in seconds on this machine:
-
-```text
-Before:
-200 identical-score judges: 0.24 seconds
-400 identical-score judges: 2.066 seconds
-800 identical-score judges: 15.929 seconds
-After:
-200 identical-score judges: 0.006 seconds
-400 identical-score judges: 0.015 seconds
-800 identical-score judges: 0.051 seconds
-```
-
-   The command used for both measurements was:
-
-```sh
-python3 -B -c 'from time import perf_counter; from blame_cli.model import Record; from blame_cli.detectors import triage
-for n in (200,400,800):
- records=[Record("t","m","r","Answer.","i","Be correct.","wrong",0,"Wrong.",j) for j in range(n)]
- start=perf_counter(); triage(records); print(n,"identical-score judges:",round(perf_counter()-start,3),"seconds")'
-```
-
-   These are observations, not timing assertions. The full triage pipeline is not claimed to be linear: cohort scans remain per observation, and copying per-judge evidence into each verdict can require quadratic output size when judges disagree.
-
-7. **Missing-requirement boundaries and abstentions.** `test_7_complete_numeric_tokens` reproduced treating `12` as present inside `12.5`; signed and percent subcases also failed. `test_7_prohibitions_and_examples_abstain` reproduced treating `avoid` and plural `examples` as positive requirements. I saw both regressions fail before the fix. Extraction and presence checks now share complete numeric-token syntax, including signs, decimals, exponents and percent suffixes. Prohibition words (`avoid`, `omit`, `exclude`), plural examples and `for instance` now conservatively cause abstention. Exact numeric presence and the existing quoted-string, unit, entity, negation and alternative tests still pass. This remains literal matching, not semantic inference.
-
-8. **Missing release license.** `test_8_mit_license_and_metadata` failed before the fix because the repository root had no LICENSE. Added the requested MIT license with `Copyright (c) 2026 Hari Naralasetty`, a README licensing section, and `pyproject.toml` metadata with `license = "MIT"`, `license-files = ["LICENSE"]`, author, Python requirement and no dependencies. The regression checks the license grant, attribution and parsed metadata. Existing public-data licensing remains separate. Package building or publication was not requested or tested.
-
-9. **Oversized integer score crash.** `test_9_oversized_integer_is_contextual_status_2` reproduced an uncaught `OverflowError` and exit 1 for `10**400`. I saw that assertion fail before the fix. The range check now runs before `math.isfinite`, so out-of-range integers are rejected before float conversion. The CLI regression verifies status 2, path plus line 1, the score-validation message, no traceback and no report output.
-
 ## What is heuristic/faked
 
-The new regressions use synthetic records only. Existing fixtures are invented; the hand-written Inspect fixture was not validated by an installed `inspect_ai`. Public-data adapter tests use the existing public Arena-Hard inputs; attribution and limitations remain in `realdata/`.
+No new benchmark run or independent annotation was performed in this release pass. The real-data claims come from the retained [findings](realdata/FINDINGS.md). The 12/12 disagreement and 8/8 cohort-loss checks were conducted by Codex and establish fidelity to the documented predicates on that sample, not eval-fault attribution precision. There is no measured recall or audited default-case precision. Answer-order swaps do not isolate causal positional bias.
 
-Infrastructure matching, requirement anchors and fixed confidence values are heuristics. An empty output or supplied error field is still treated as infrastructure evidence. The requirement reasoner deliberately abstains on supported prohibition/example constructions and cannot resolve all English phrasing, implied requirements or semantic equivalents. `genuine_failure` is the default when no detector fires and does not establish model responsibility. Judge disagreements and cohort-wide zeros describe supplied observations, not proof of a faulty evaluation.
+The README demo is synthetic. The Inspect fixture is hand-written and was not validated against an installed Inspect package. Infrastructure and missing-requirement rules remain heuristics; confidence values are fixed strengths, not calibrated probabilities. `genuine_failure` remains the default for unclassified losses. A cohort-wide zero or judge disagreement is a review hypothesis and can coexist with real candidate defects. The shipped reasoner is deterministic; the existing `Reasoner` interface remains the extension point for an LLM. No LLM API calls were made.
 
 ## What failed or is flaky
 
-The initial regression failures were expected reproductions and are recorded above. An intermediate implementation reported an unterminated CSV field at line 1 because `DictReader.line_num` was stale when parsing raised; this was corrected to use the underlying CSV reader's consumed physical line count. The final malformed-CSV regression verifies line 2. No failures remained in the final full suite and no flaky behavior was observed. Benchmark times depend on the machine; the regression uses operation counts instead of elapsed time.
+The first direct PyPI check using Python's `urllib` failed because this machine's Python could not verify the certificate chain. Actual exception excerpt:
 
-Spreadsheet escaping was verified as serialized data, without opening Excel or LibreOffice; saving through another application can change its escaping. CSV fields and reports remain memory-bound. Python 3.11 compatibility follows from the standard-library APIs and syntax used; only Python 3.13.4 was run here. No real Inspect installation, package build, publication or new human-label study was performed.
+```text
+ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1028)
+```
+
+The web tool and system curl verified the endpoints successfully. The clean-venv pip install also succeeded with certificate verification enabled. No trust settings were changed.
+
+No test failures or flaky behavior were observed in the final suite. Local verification used Python 3.13.4 only. The new [GitHub Actions workflow](.github/workflows/tests.yml) runs `make test` on Python 3.11, 3.12 and 3.13; it was not executed here. Preview structure and content were checked programmatically; no browser rendering or accessibility audit was performed.
+
+There is no git remote configured (`git remote -v` returned no output), so the LinkedIn first comment uses `REPO_URL` rather than an invented public URL. The draft explicitly marks that replacement. Package installation from a checkout was tested; PyPI publication was not attempted.
 
 ## Next steps
 
-The reviewer can inspect and commit these changes. Independent human labeling and a real public Inspect text export remain useful validation work outside this fix round. No further implementation is needed for these nine findings.
+Replace `REPO_URL` with the actual public repository URL before posting. Let the added workflow run on GitHub before claiming the full Python matrix passes. If publishing a distribution later, choose and recheck one of the proposed names while keeping the `blame` command.
 
 ## Verdict
 
-All nine review findings were reproduced and fixed with regressions observed failing before the fixes. The final `make test` run passes all 45 tests, including the previously blocked temporary-directory workflows. The CLI now avoids the reported false infrastructure verdicts, exports escaped spreadsheet cells with exact originals retained, handles long and malformed CSV, rejects tool-only Inspect output consistently, preserves valid generic JSONL, reuses judge disagreement counts, respects the tested requirement boundaries, validates huge scores safely, and includes the requested MIT license and metadata. This supports release as a small offline triage utility with documented heuristic limits; it does not establish real-world detector precision. Changes are uncommitted as requested.
+The release material now leads with a reproducible public result and a concrete example, explains the precision and attribution limits, and provides a small static preview plus a verified three-command installation path. The existing 45-test suite passes locally on Python 3.13.4. The LinkedIn draft meets the requested length and format, with the actual repo URL still to fill in. The CI matrix is configured but unrun. This supports sharing the tool as a local eval-review aid without claiming validated causal attribution. All changes remain uncommitted; no push or publication was performed.
