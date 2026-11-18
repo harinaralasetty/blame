@@ -5,7 +5,7 @@ from dataclasses import asdict
 import re
 from typing import Protocol, Sequence
 
-from .model import CLASSES, Finding, Record
+from .model import CLASSES, Finding, Record, record_dict
 
 
 # The single source of truth for infrastructure rules, including non-regex rules.
@@ -27,6 +27,8 @@ def infra(record: Record) -> Finding | None:
         if name == "error_field":
             matched = bool(record.error and record.error.strip())
             quote = record.error
+        elif record.output is None:
+            continue  # The format does not carry the output, so output rules cannot apply.
         elif name == "empty_output":
             matched = not record.output.strip()
             quote = record.output
@@ -42,7 +44,7 @@ def _judge_disagreement(peers: Sequence[Record]) -> dict | None:
     """Summarize one identity group without enumerating judge pairs."""
     runs: dict[int, set[float]] = defaultdict(set)
     for peer in peers:
-        if peer.judge_run is not None:
+        if peer.judge_run is not None and peer.score is not None:
             runs[peer.judge_run].add(peer.score)
     # Conflicting scores within a judge run do not establish independent judging.
     if any(len(scores) != 1 for scores in runs.values()):
@@ -146,7 +148,7 @@ class HeuristicReasoner:
 
 
 def unstated_requirement(record: Record, reasoner: Reasoner) -> Finding | None:
-    if record.score == 1:
+    if record.score == 1 or record.instruction is None or record.rubric_item_text is None:
         return None
     evidence = reasoner.missing_requirements(record.instruction, record.rubric_item_text)
     return Finding("unstated_requirement", 0.65, evidence) if evidence else None
@@ -156,6 +158,7 @@ def triage(records: Sequence[Record], reasoner: Reasoner | None = None) -> list[
     reasoner = reasoner if reasoner is not None else HeuristicReasoner()
     by_item: dict[tuple, list[Record]] = defaultdict(list)
     by_judge: dict[tuple, list[Record]] = defaultdict(list)
+    records = [record for record in records if record.role == "candidate"]
     for record in records:
         by_item[record.item_key].append(record)
         by_judge[record.judge_key].append(record)
@@ -174,6 +177,6 @@ def triage(records: Sequence[Record], reasoner: Reasoner | None = None) -> list[
             "output_quote": record.output, "judge_reasoning_quote": record.judge_reasoning,
             "note": "No precision-first detector fired. Default, not a proven model failure.",
         })
-        verdicts.append({"record_id": record.record_id, "record": asdict(record),
+        verdicts.append({"record_id": record.record_id, "record": record_dict(record),
                          **asdict(selected), "matches": [asdict(f) for f in findings]})
     return verdicts

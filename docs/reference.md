@@ -5,14 +5,16 @@ See the [README](../README.md) for setup, public findings and limits.
 ## Commands
 
 ```text
-./blame report IN... --out DIR
-./blame label IN... --out labels.csv
+./blame report IN... --out DIR [--format auto|generic|inspect]
+./blame label IN... --out labels.csv [--format auto|generic|inspect]
 ./blame score labels.csv
 ```
 
+`--format` names the reader for every `IN`. The default `auto` detects it per input: a file ending `.eval` is rejected; a file holding one JSON object is `generic` if it has `task_id`, else `inspect` if it has `eval` or `samples`; anything else is read as generic JSONL. Readers live in `blame_cli/formats/`.
+
 The executable is named `blame`; use `./blame` from this checkout or put this directory on PATH. `python3 -m blame_cli` is equivalent. Inputs may mix generic JSONL and Inspect text JSON. Errors return status 2 with the input path and, for JSONL, the line number. Files are read before any reports are written. Exact duplicate records are ignored with a warning.
 
-`label` produces one row per lost observation with a stable record ID, instruction, rubric, output, score, judge reasoning, predicted label, all detector matches, confidence, evidence, and an empty `human_label`. Fill only `human_label` with one of the five class names, then run `score`. Keep predictions and detector matches unchanged.
+`label` produces one row per lost or ungraded observation with a stable record ID, instruction, rubric, output, score, judge reasoning, predicted label, all detector matches, confidence, evidence, and an empty `human_label`. Fill only `human_label` with one of the five class names, then run `score`. Keep predictions and detector matches unchanged.
 
 CSV display cells beginning with `=`, `+`, `-`, or `@` (including after whitespace), or a tab, carriage return or newline, receive a leading apostrophe to keep them as spreadsheet text. The separate `original_record_json` column retains the exact record as JSON, including the original output; record IDs do not change. Leave the apostrophes in place when labeling. This protects the generated export; spreadsheet software can alter escaping when saving it again.
 
@@ -29,6 +31,18 @@ One JSON object per line, with these fields:
 ```
 
 All fields except `score` and `judge_run` are strings; `error` may also be null or omitted. All fields except `judge_run` and `error` are required. Output and judge reasoning may be empty. `score` must be a finite number in [0,1], with 1 meaning full credit. `judge_run` is an optional integer or null. A nonempty error string indicates an infrastructure failure. Unknown extra fields, including `eval` and `samples`, are ignored on generic records. Records use newline delimiters (LF or CRLF); Unicode separators inside JSON strings remain part of the text.
+
+Optional keys, each a non-empty string, null or absent:
+
+| Key | Meaning |
+| --- | --- |
+| `agent` | The agent or scaffold that ran the model. Reports group by system: agent and model joined with ` / `. |
+| `role` | `candidate` (default) or `reference`. A reference record is a run of the task's reference solution; it is not counted as a system under test. |
+| `error_kind` | How the harness classified the error: `infra`, `setup`, `grader`, `agent` or `unknown`. Records of one attempt must agree on it. |
+| `task_version` | A task checksum or revision. |
+| `job_id` | The job or harness run the attempt belongs to. |
+
+`score` may be `null` when the attempt was never graded; `error` must then say why. Such a record is listed as ungraded and adds nothing to lost items or lost points. A record that leaves every optional key out keeps the record ID it had in 0.1.0, so existing label files still match.
 
 ## Inspect JSON mapping
 
@@ -57,6 +71,23 @@ Use text JSON from `inspect eval --log-format json`. Binary `.eval` files are un
 The metadata keys above are application conventions in Inspect's free-form metadata, not built-in rubric fields. Without rubric metadata, the item text identifies the scorer and says the rubric is unavailable; the unstated requirement detector abstains with an input warning. Samples with no scores are omitted with a warning, without inventing zero scores. Header-only logs, unresolved attachments, and non-text content are rejected. Aggregate results, events, score history, plan, stats, targets, and other fields are not read. Input instructions must include any system or developer requirements needed to assess the rubric.
 
 `fixtures/inspect.json` was hand-written using these documented field shapes. It was not produced or validated by an installed `inspect_ai`. No Inspect package was installed. Tests cover this fixture, chat input, text blocks, dictionary scores, fractional credit, missing rubric text, errors, and unsupported values.
+
+## Report schema 2
+
+`report.json` has `schema_version: 2`. For an input that uses none of the optional keys, every value 0.1.0 reported is unchanged; schema 2 only adds keys.
+
+| Key | Meaning |
+| --- | --- |
+| `scored_items` | Candidate records with a score. |
+| `lost_items`, `lost_points` | Scored candidate records below 1, and the sum of `1 - score` over scored candidate records. |
+| `ungraded_items` | Candidate records with `score: null`. They appear in `items` with their error. |
+| `reference_items` | Reference records. They are never counted above and never listed in `items`. |
+| `by_class[]` | One row per label with `category`, `lost_items`, `lost_points` and `ungraded_items`. |
+| `by_model[]` | One row per system. The key is still `model`; it holds the system string. |
+| `by_task[]` | One row per task with a lost or ungraded attempt: `systems_attempted`, `systems_failed` (systems with a scored check below 1), `reference` ("passed n of m attempts" or "no reference run supplied"), `labels` (count of every detector match; the default label counts where no detector matched), `primary_label` (the most frequent verdict on the task, ties to the higher precedence), `category`, `max_confidence` and `next_step`. |
+| `items[]` | Each lost or ungraded record with its verdict, evidence and all detector matches. `record` holds the eleven 0.1.0 keys plus any optional key that is set. |
+
+Markdown and HTML show the same data. They print `confidence` as "rule strength", and a text field the format does not carry as "not available in this format". In HTML the per-task rows are a list under "Failed tasks".
 
 ## Detectors and confidence
 

@@ -119,6 +119,8 @@ def inspect_records(log: dict) -> tuple[list[Record], list[str]]:
 
 
 def detect(path: Path) -> bool:
+    if path.is_dir():
+        return False
     try:
         whole = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:

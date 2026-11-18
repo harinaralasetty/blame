@@ -32,7 +32,7 @@ Install from this checkout. The PyPI project named `blame` belongs to another to
 
 ## Use your own results
 
-Accepts generic JSONL or a documented subset of Inspect v2 text JSON. Binary `.eval` files and tool-only outputs are unsupported. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation.
+Accepts generic JSONL or a documented subset of Inspect v2 text JSON. Binary `.eval` files and tool-only outputs are unsupported. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation. Optional keys can name the agent, mark a reference-solution run, carry the harness error class and mark an attempt as never graded (`score: null`).
 
 After activating the venv, the workflow is:
 
@@ -55,7 +55,7 @@ blame score labels.csv
 ## Architecture
 
 - `blame_cli.cli` implements report, label and score commands.
-- `inputs` and `model` validate generic and Inspect records.
+- `formats` holds one reader per input format; `inputs` and `model` validate the records.
 - `detectors` applies deterministic rules and preserves overlapping matches.
 - `Reasoner.missing_requirements` is the pluggable interface for a future LLM; the shipped implementation uses heuristics only.
 - `reports` renders JSON, Markdown and self-contained HTML; `labels` handles CSV and label metrics.

@@ -16,12 +16,14 @@ FORMATS = tuple(READERS)
 
 
 def detect_format(path: Path) -> str:
+    if path.is_dir():
+        found = next((name for name, reader in READERS.items() if reader.detect(path)), None)
+        if found is None:
+            raise ValueError("no reader recognises this directory")
+        return found
     if path.suffix == ".eval":
         raise ValueError("binary .eval files are unsupported; use Inspect text JSON")
-    for name, reader in READERS.items():
-        if reader.detect(path):
-            return name
-    raise ValueError("not a supported input (tried: " + ", ".join(FORMATS) + ")")
+    return next(name for name, reader in READERS.items() if reader.detect(path))
 
 
 def load_path(path: Path, fmt: str = "auto") -> tuple[list[Record], list[str]]:

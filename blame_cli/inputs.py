@@ -8,14 +8,15 @@ from .formats.inspect_json import inspect_records  # noqa: F401  (kept importabl
 from .model import Record
 
 
-def load_inputs(paths: Iterable[str]) -> tuple[list[Record], list[str]]:
+def load_inputs(paths: Iterable[str], fmt: str = "auto") -> tuple[list[Record], list[str]]:
     records = []
     warnings = []
     seen = set()
     judges = {}
+    kinds = {}
     for path in paths:
         try:
-            loaded, notes = load_path(Path(path))
+            loaded, notes = load_path(Path(path), fmt)
             warnings.extend(f"{path}: {note}" for note in notes)
             for record in loaded:
                 if record.record_id in seen:
@@ -26,6 +27,10 @@ def load_inputs(paths: Iterable[str]) -> tuple[list[Record], list[str]]:
                     if key in judges and judges[key] != record.score:
                         raise ValueError("conflicting scores for the same output and judge_run")
                     judges[key] = record.score
+                # One attempt has one harness outcome, however many checks it carries.
+                attempt = record.attempt_key + (record.judge_run,)
+                if kinds.setdefault(attempt, record.error_kind) != record.error_kind:
+                    raise ValueError(f"conflicting error_kind for attempt {record.run_id!r} of task {record.task_id!r}")
                 records.append(record)
                 seen.add(record.record_id)
         except UnicodeDecodeError:

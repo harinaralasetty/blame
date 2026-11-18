@@ -53,7 +53,7 @@ class ReviewRound1Tests(unittest.TestCase):
                 for field in ("task_id", "model", "run_id", "rubric_item_id", "instruction",
                               "rubric_item_text", "output", "judge_reasoning"):
                     self.assertEqual(row[field], "'" + payload)
-                self.assertEqual(json.loads(row["original_record_json"]), asdict(record))
+                self.assertEqual(Record.from_dict(json.loads(row["original_record_json"])), record)
                 self.assertEqual(score_labels(str(path))["unlabeled_rows"], 1)
 
     def test_3_writer_long_answer_can_be_scored(self):

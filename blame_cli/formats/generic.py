@@ -7,8 +7,8 @@ from ..model import Record
 
 
 def detect(path: Path) -> bool:
-    # The fallback for any file that no earlier format claimed.
-    return path.is_file()
+    # The fallback for anything that is not a directory and that no earlier format claimed.
+    return not path.is_dir()
 
 
 def load(path: Path) -> tuple[list[Record], list[str]]:
