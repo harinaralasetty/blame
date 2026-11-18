@@ -2,6 +2,12 @@
 
 Notable changes to `blame`. Versions follow `pyproject.toml`.
 
+## Unreleased
+
+- README restyled in the house format, with a hero image drawn from real output and a
+  social preview card under `docs/assets/`. It now documents the install from GitHub
+  (`pip install git+https://github.com/harinaralasetty/blame`). No code change.
+
 ## 0.2.0
 
 Cross-format input and report schema 2. Outputs for 0.1.0 inputs are unchanged except

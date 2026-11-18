@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="342" viewBox="0 0 880 342" role="img" aria-labelledby="title desc">
+  <title id="title">blame report on the synthetic fixture</title>
+  <desc id="desc">blame reads 36 scored observations, finds 21 lost items and sorts them: 4 infra, 1 judge_unstable, 6 item_everyone_loses, 4 unstated_requirement and 6 genuine_failure.</desc>
+  <rect width="880" height="342" rx="16" fill="#111827"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" fill="#e5e7eb">
+    <text x="28" y="40" xml:space="preserve" fill="#93c5fd">$ blame report fixtures/synthetic.jsonl --out demo</text>
+    <text x="28" y="67" xml:space="preserve">Wrote demo/report.md, report.json, report.html (21 lost items)</text>
+    <text x="28" y="108" xml:space="preserve" fill="#9ca3af">demo/report.md, By class (rows with no lost items left out)</text>
+    <text x="28" y="135" xml:space="preserve">Scored observations: 36. Lost items: 21. Lost points: 21.</text>
+    <text x="28" y="176" xml:space="preserve" fill="#93c5fd">class                  category      lost_items  lost_points</text>
+    <text x="28" y="203" xml:space="preserve">infra                  infra                  4          4.0</text>
+    <text x="28" y="230" xml:space="preserve">judge_unstable         grader                 1          1.0</text>
+    <text x="28" y="257" xml:space="preserve">item_everyone_loses    task                   6          6.0</text>
+    <text x="28" y="284" xml:space="preserve">unstated_requirement   instruction            4          4.0</text>
+    <text x="28" y="311" xml:space="preserve" fill="#86efac">genuine_failure        unexplained            6          6.0</text>
+  </g>
+</svg>
