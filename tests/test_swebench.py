@@ -1,4 +1,4 @@
-"""The SWE-bench reader. Fixtures are hand-written; the reader is unverified against real harness output."""
+"""The SWE-bench reader. Hand-written fixtures; tests/test_real_swebench.py covers real harness output."""
 
 import hashlib
 import json
@@ -259,7 +259,7 @@ class FixtureTests(unittest.TestCase):
                 self.assertIn("judge_unstable", (Path(tmp) / "report.md").read_text(encoding="utf-8"))
             help_text = subprocess.run([sys.executable, "-m", "blame_cli", "report", "--help"], cwd=ROOT, text=True,
                                        capture_output=True).stdout
-            self.assertIn("harbor and swebench are unverified against real harness output", " ".join(help_text.split()))
+            self.assertIn("harbor and swebench were checked against a few real runs", " ".join(help_text.split()))
 
 
 if __name__ == "__main__":

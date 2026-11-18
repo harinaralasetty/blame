@@ -1,0 +1,23 @@
+2026-11-18 14:12:11,800 - INFO - Creating container for sympy__sympy-20590...
+2026-11-18 14:12:11,852 - INFO - Container for sympy__sympy-20590 created: 6d7fd5ad252689c2f21f08b7b0b561da55727cf1842633e9f5f9ff656059261e
+2026-11-18 14:12:11,936 - INFO - Container for sympy__sympy-20590 started: 6d7fd5ad252689c2f21f08b7b0b561da55727cf1842633e9f5f9ff656059261e
+2026-11-18 14:12:11,937 - INFO - Intermediate patch for sympy__sympy-20590 written to logs/run_evaluation/blame-m7-demo/demo-model/sympy__sympy-20590/patch.diff, now applying to container...
+2026-11-18 14:12:12,047 - INFO - >>>>> Applied Patch:
+Checking patch blame_note.txt...
+Applied patch blame_note.txt cleanly.
+
+2026-11-18 14:12:12,380 - INFO - Git diff before:
+
+2026-11-18 14:12:12,380 - INFO - Eval script for sympy__sympy-20590 written to logs/run_evaluation/blame-m7-demo/demo-model/sympy__sympy-20590/eval.sh; copying to container...
+2026-11-18 14:12:16,559 - INFO - Test runtime: 4.14 seconds
+2026-11-18 14:12:16,560 - INFO - Test output for sympy__sympy-20590 written to logs/run_evaluation/blame-m7-demo/demo-model/sympy__sympy-20590/test_output.txt
+2026-11-18 14:12:16,631 - INFO - Git diff after:
+
+2026-11-18 14:12:16,631 - INFO - Grading answer for sympy__sympy-20590...
+2026-11-18 14:12:16,632 - INFO - report: {'sympy__sympy-20590': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'infra_failure': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_immutable']}, 'PASS_TO_PASS': {'success': ['test__aresame', 'test_structure', 'test_equality', 'test_matches_basic', 'test_has', 'test_subs', 'test_subs_with_unicode_symbols', 'test_atoms', 'test_free_symbols_empty', 'test_doit', 'test_S', 'test_xreplace', 'test_preorder_traversal', 'test_sorted_args', 'test_call', 'test_rewrite', 'test_literal_evalf_is_number_is_zero_is_comparable', 'test_as_Basic', 'test_atomic', 'test_as_dummy', 'test_canonical_variables'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-20590: resolved: False
+2026-11-18 14:12:16,632 - INFO - Attempting to stop container sweb.eval.sympy__sympy-20590.blame-m7-demo...
+2026-11-18 14:12:29,757 - INFO - Container sweb.eval.sympy__sympy-20590.blame-m7-demo stopped successfully.
+2026-11-18 14:12:29,757 - INFO - Attempting to remove container sweb.eval.sympy__sympy-20590.blame-m7-demo...
+2026-11-18 14:12:29,784 - INFO - Failed to remove container sweb.eval.sympy__sympy-20590.blame-m7-demo: Command '['docker', 'rm', '--force', '6d7fd5ad252689c2f21f08b7b0b561da55727cf1842633e9f5f9ff656059261e']' returned non-zero exit status 1.
+Command output: None

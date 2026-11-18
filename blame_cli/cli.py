@@ -18,7 +18,7 @@ def main(argv=None) -> int:
     report.add_argument("--out", required=True, metavar="DIR")
     formats = {"choices": ("auto", *sorted(FORMATS)), "default": "auto",
                "help": "input format of every IN (default: auto, detected per input); "
-                       "harbor and swebench are unverified against real harness output"}
+                       "harbor and swebench were checked against a few real runs of one harness version each"}
     report.add_argument("--format", **formats)
     label = commands.add_parser("label", help="write a CSV with blank human labels")
     label.add_argument("inputs", nargs="+", metavar="IN")

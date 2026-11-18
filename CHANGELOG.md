@@ -53,6 +53,23 @@ where an entry below says "Behaviour change".
 - A directory as `IN` is no longer always an error; a directory no reader
   recognises is still one, and the message says what was looked for.
 
+Checked against real harness output (Harbor 0.24.0 and swebench 5.0.2, local Docker),
+before release. The "unverified" wording above describes the readers as first written.
+
+- Real output is kept in `fixtures/real-harbor` and `fixtures/real-swebench`, with the
+  harness version and commands in each README, and tested in
+  `tests/test_real_harbor.py` and `tests/test_real_swebench.py`.
+- SWE-bench: the harness writes its summary as `<model_dir>.<run_id>.json` beside
+  `logs/`, not `results.json` in the run directory. That file is now read, so empty
+  patches and errors without an instance directory are reported for real runs.
+- SWE-bench: the directory the harness ran in and its `logs/` are accepted as `IN`,
+  and a run in which every instance errored (no `report.json` anywhere) is read
+  instead of being rejected as an unknown directory.
+- Harbor: a trial that failed before the agent started (for example an image that
+  does not build, which Harbor 0.24.0 records as a plain `RuntimeError`) says so in
+  its error text. It stays ungraded with `error_kind` `unknown`.
+- Docs and `--format` help now say what was checked instead of "unverified".
+
 Fixes from the independent check (`docs/CHECK-cross-format.md`), before release:
 
 - SWE-bench: the layout decides what a run directory is. A `results.json` beside the

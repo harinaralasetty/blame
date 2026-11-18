@@ -36,10 +36,10 @@ Install from this checkout. The PyPI project named `blame` belongs to another to
 | --- | --- | --- |
 | Generic JSONL | a `.jsonl` file | tested on synthetic fixtures and the public Arena-Hard conversion |
 | Inspect v2 text JSON | a log from `inspect eval --log-format json` | a documented subset; fixture hand-written, not validated by `inspect_ai` |
-| Harbor | a trial directory, a job directory or a directory of jobs | unverified against real harness output |
-| SWE-bench harness | a run directory under `logs/evaluation`, or that directory | unverified against real harness output |
+| Harbor | a trial directory, a job directory or a directory of jobs | checked against real output of Harbor 0.24.0 (`fixtures/real-harbor`) |
+| SWE-bench harness | the directory the harness ran in, its `logs/run_evaluation`, or one run directory | checked against real output of swebench 5.0.2 (`fixtures/real-swebench`) |
 
-The format is detected per input; `--format` forces one. The Harbor and SWE-bench readers were written from the harness source code and tested only on hand-written fixtures, so check a report against your own files before relying on it. The two fixtures show the shape (run from the checkout):
+The format is detected per input; `--format` forces one. The Harbor and SWE-bench readers were written from the harness source code and then checked against a few small real runs (one harness version each, local Docker; the runs and commands are in `fixtures/real-harbor/README.md` and `fixtures/real-swebench/README.md`). Most harness error classes were not produced in those runs, so check a report against your own files before relying on it. Two hand-written fixtures show the shape (run from the checkout):
 
 ```text
 ./blame report fixtures/harbor-job --out demo-harbor

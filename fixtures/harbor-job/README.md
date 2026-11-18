@@ -2,8 +2,8 @@ Hand-written from source reading at commit 3ee9f53e6b459712fdec4e8ce6613d7aa5610
 
 The commit is `harbor-framework/harbor@3ee9f53e6b459712fdec4e8ce6613d7aa5610299`
 (`src/harbor/models/trial/result.py`, `trial/error_policy.py`, `verifier/result.py`,
-`agent/name.py`). No Harbor run produced these files and the reader that parses them
-is unverified against real harness output. Every name, path, id and message here is
+`agent/name.py`). No Harbor run produced these files; real output is in
+`fixtures/real-harbor`. Every name, path, id and message here is
 made up; there is no third-party data.
 
 The directory is shaped like one Harbor job: a job-level `result.json` and one

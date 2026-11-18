@@ -1,7 +1,8 @@
 """Read Harbor trial results: a trial directory, a job directory or a directory of jobs.
 
 Written from a reading of harbor-framework/harbor at commit
-3ee9f53e6b459712fdec4e8ce6613d7aa5610299 and unverified against real harness output.
+3ee9f53e6b459712fdec4e8ce6613d7aa5610299 and checked against the output of Harbor 0.24.0
+(fixtures/real-harbor).
 Only <trial>/result.json and <trial>/verifier/test-stdout.txt are read; `config`,
 `trial_uri` and `exception_traceback` are never read.
 """
@@ -127,6 +128,10 @@ def _failure(data: dict) -> tuple[str | None, str | None, bool]:
             kind = "agent" if override else "unknown" if kind == "agent" else kind
             valid = override
         text += f" ({note})"
+    if kind == "unknown" and isinstance(data.get("environment_setup"), dict) \
+            and "agent_setup" in data and "agent_execution" in data \
+            and data["agent_setup"] is None and data["agent_execution"] is None:
+        text += " (raised while the environment was being set up; the agent never started)"
     return text, kind, valid
 
 

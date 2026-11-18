@@ -1,4 +1,4 @@
-"""The Harbor reader. Fixtures are hand-written; the reader is unverified against real harness output."""
+"""The Harbor reader. Hand-written fixtures; tests/test_real_harbor.py covers real harness output."""
 
 import json
 from pathlib import Path
@@ -256,7 +256,7 @@ class FixtureTests(unittest.TestCase):
             self.assertEqual(wrong.returncode, 0, wrong.stderr)  # fixtures/ holds the job one level down
             help_text = subprocess.run([sys.executable, "-m", "blame_cli", "report", "--help"], cwd=ROOT, text=True,
                                        capture_output=True).stdout
-            self.assertIn("unverified against real harness", " ".join(help_text.split()))
+            self.assertIn("checked against a few real runs", " ".join(help_text.split()))
 
 
 if __name__ == "__main__":

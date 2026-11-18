@@ -1,0 +1,100 @@
+{
+    "id": "13c8d109-4b78-4d46-81e0-39c134d2a68d",
+    "task_name": "broken",
+    "trial_name": "broken__3QJXT9W",
+    "trial_uri": "file:///work/jobs/cand-broken/broken__3QJXT9W",
+    "task_id": {
+        "path": "broken"
+    },
+    "source": null,
+    "task_checksum": "9e0348e80fed24c7222217c4ef7217478a256b9816d8b511222cb576e75aa6b9",
+    "config": {
+        "task": {
+            "path": "broken",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "broken__3QJXT9W",
+        "trials_dir": "jobs/cand-broken",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "scripted_agent:ScriptedAgent",
+            "import_path": null,
+            "model_name": null,
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "resume_trajectory": false,
+            "load_trajectory": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "user_agent": null,
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "stream": false,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "extra_instructions": [],
+        "job_id": "352d2cbb-eae0-4948-a12d-fdda0190cc73",
+        "source_trial": null
+    },
+    "agent_info": {
+        "name": "scripted",
+        "version": "1.0.0",
+        "model_info": null
+    },
+    "agent_result": null,
+    "verifier_result": null,
+    "verifier_environment_mode": "shared",
+    "exception_info": {
+        "exception_type": "RuntimeError",
+        "exception_message": "Docker compose command failed for environment broken. Command: docker compose --project-name broken__3qjxt9w__env --project-directory /work/broken/environment -f /tmp/tmp3n70p7ml/broken__3QJXT9W__env-docker-compose-resources.json -f /home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/environments/docker/docker-compose-build.yaml -f /tmp/tmpniwva00b/docker-compose-environment.json -f /tmp/tmpilgxgts_/docker-compose-mounts.json build. Return code: 1. Stdout:  Image broken__3qjxt9w__env-main Building \n#1 [internal] load local bake definitions\n#1 reading from stdin 738B done\n#1 DONE 0.0s\n\n#2 [internal] load build definition from Dockerfile\n#2 transferring dockerfile: 79B done\n#2 DONE 0.0s\n\n#3 [internal] load metadata for docker.io/library/ubuntu:24.04\n#3 DONE 0.5s\n\n#4 [internal] load .dockerignore\n#4 transferring context: 2B done\n#4 DONE 0.0s\n\n#5 [1/3] FROM docker.io/library/ubuntu:24.04@sha256:73b999393d07f2bf65a40373778a44dc9a6d54ad7718d29247d8ff9413c4d6a8\n#5 resolve docker.io/library/ubuntu:24.04@sha256:73b999393d07f2bf65a40373778a44dc9a6d54ad7718d29247d8ff9413c4d6a8 done\n#5 CACHED\n\n#6 [2/3] RUN exit 7\n#6 ERROR: process \"/bin/sh -c exit 7\" did not complete successfully: exit code: 7\n------\n > [2/3] RUN exit 7:\n------\nDockerfile:2\n\n--------------------\n\n   1 |     FROM ubuntu:24.04\n\n   2 | >>> RUN exit 7\n\n   3 |     WORKDIR /app\n\n   4 |     \n\n--------------------\n\nfailed to solve: process \"/bin/sh -c exit 7\" did not complete successfully: exit code: 7\n\n. Stderr: None. ",
+        "exception_traceback": "Traceback (most recent call last):\n  File \"/home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/trial/trial.py\", line 497, in run\n    await self._prepare()\n  File \"/home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/trial/trial.py\", line 536, in _prepare\n    await self._setup_agent_environment()\n  File \"/home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/trial/trial.py\", line 1684, in _setup_agent_environment\n    await self._start_agent_environment()\n  File \"/home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/trial/trial.py\", line 1690, in _start_agent_environment\n    await asyncio.wait_for(\n    ...<4 lines>...\n    )\n  File \"/home/user/.local/share/uv/python/cpython-3.14.9-macos-aarch64-none/lib/python3.14/asyncio/tasks.py\", line 486, in wait_for\n    return await fut\n           ^^^^^^^^^\n  File \"/home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/environments/docker/docker.py\", line 1056, in start\n    await self._run_docker_compose_command([\"build\"])\n  File \"/home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/environments/docker/docker.py\", line 756, in _run_docker_compose_command\n    raise RuntimeError(\n    ...<5 lines>...\n    )\nRuntimeError: Docker compose command failed for environment broken. Command: docker compose --project-name broken__3qjxt9w__env --project-directory /work/broken/environment -f /tmp/tmp3n70p7ml/broken__3QJXT9W__env-docker-compose-resources.json -f /home/user/.local/share/uv/tools/harbor/lib/python3.14/site-packages/harbor/environments/docker/docker-compose-build.yaml -f /tmp/tmpniwva00b/docker-compose-environment.json -f /tmp/tmpilgxgts_/docker-compose-mounts.json build. Return code: 1. Stdout:  Image broken__3qjxt9w__env-main Building \n#1 [internal] load local bake definitions\n#1 reading from stdin 738B done\n#1 DONE 0.0s\n\n#2 [internal] load build definition from Dockerfile\n#2 transferring dockerfile: 79B done\n#2 DONE 0.0s\n\n#3 [internal] load metadata for docker.io/library/ubuntu:24.04\n#3 DONE 0.5s\n\n#4 [internal] load .dockerignore\n#4 transferring context: 2B done\n#4 DONE 0.0s\n\n#5 [1/3] FROM docker.io/library/ubuntu:24.04@sha256:73b999393d07f2bf65a40373778a44dc9a6d54ad7718d29247d8ff9413c4d6a8\n#5 resolve docker.io/library/ubuntu:24.04@sha256:73b999393d07f2bf65a40373778a44dc9a6d54ad7718d29247d8ff9413c4d6a8 done\n#5 CACHED\n\n#6 [2/3] RUN exit 7\n#6 ERROR: process \"/bin/sh -c exit 7\" did not complete successfully: exit code: 7\n------\n > [2/3] RUN exit 7:\n------\nDockerfile:2\n\n--------------------\n\n   1 |     FROM ubuntu:24.04\n\n   2 | >>> RUN exit 7\n\n   3 |     WORKDIR /app\n\n   4 |     \n\n--------------------\n\nfailed to solve: process \"/bin/sh -c exit 7\" did not complete successfully: exit code: 7\n\n. Stderr: None. \n",
+        "occurred_at": "2026-11-18T08:38:44.729512Z"
+    },
+    "started_at": "2026-11-18T08:38:43.584115Z",
+    "finished_at": "2026-11-18T08:38:45.370706Z",
+    "environment_setup": {
+        "started_at": "2026-11-18T08:38:43.646228Z",
+        "finished_at": "2026-11-18T08:38:44.727273Z"
+    },
+    "agent_setup": null,
+    "agent_execution": null,
+    "verifier": null,
+    "step_results": null
+}

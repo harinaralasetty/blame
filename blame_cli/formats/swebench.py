@@ -1,9 +1,12 @@
 """Read SWE-bench harness output: one run directory or a directory of run directories.
 
 Written from a reading of SWE-bench/SWE-bench at commit
-02e7a74ffd0b707aab73d203fe87bdc7c76afc8e and unverified against real harness output.
-The layout is <run_id>/<model_dir>/<instance_id>/{report.json, patch.diff,
-run_instance.log} with the run summary at <run_id>/results.json.
+02e7a74ffd0b707aab73d203fe87bdc7c76afc8e and checked against the output of swebench 5.0.2
+(fixtures/real-swebench). The harness writes, under the directory it is run from,
+logs/run_evaluation/<run_id>/{run.json, <model_dir>/<instance_id>/{report.json, patch.diff,
+run_instance.log}} and one summary per model at <model_dir>.<run_id>.json beside logs/.
+A results.json inside the run directory is read as a summary too. The working directory,
+logs/, run_evaluation/ or one run directory may be given.
 """
 
 from dataclasses import replace
@@ -16,7 +19,8 @@ from ._text import ERROR_CHARS, OUTPUT_CHARS, clip, redact
 
 
 PROBE = ("SWE-bench (a report.json two or three levels below the directory whose single key is the name "
-         "of the directory holding it, with a true or false resolved value)")
+         "of the directory holding it, with a true or false resolved value; or a run directory holding "
+         "run.json and a run_instance.log two levels down; logs/run_evaluation is looked into)")
 GROUPS = ("FAIL_TO_PASS", "PASS_TO_PASS", "FAIL_TO_FAIL", "PASS_TO_FAIL")
 NAMES = 20
 LOG_LINES = 5
@@ -35,7 +39,17 @@ def _entry(file: Path) -> dict | None:
 
 
 def _has_report(path: Path) -> bool:
-    return any(_entry(file) for file in sorted(path.glob("*/*/report.json")))
+    """Whether path is a run directory: a report two levels down, or the harness's run.json and an instance log."""
+    return any(_entry(file) for file in sorted(path.glob("*/*/report.json"))) or (
+        (path / "run.json").is_file() and any(path.glob("*/*/run_instance.log")))
+
+
+def _base(path: Path) -> Path:
+    """The directory of run directories when path is the harness's working directory or its logs/."""
+    for inner in (path / "logs" / "run_evaluation", path / "run_evaluation"):
+        if inner.is_dir() and (inner.parent.name == "logs"):
+            return inner
+    return path
 
 
 def _runs(path: Path) -> list[Path]:
@@ -54,8 +68,10 @@ def _runs(path: Path) -> list[Path]:
 
 
 def detect(path: Path) -> bool:
-    return path.is_dir() and any(_entry(file) for pattern in ("*/*/report.json", "*/*/*/report.json")
-                                 for file in sorted(path.glob(pattern)))
+    if not path.is_dir():
+        return False
+    path = _base(path)
+    return _has_report(path) or any(_has_report(child) for child in sorted(path.iterdir()) if child.is_dir())
 
 
 def _yes(value) -> str:
@@ -155,18 +171,42 @@ def _ids(summary: dict, key: str) -> list[str]:
                    and item not in (".", "..")}) if isinstance(found, list) else []
 
 
+def _summaries(run: Path, models: list[Path]) -> list[tuple[str, Path, list[Path]]]:
+    """(name, file, model directories it covers) for each run summary found.
+
+    results.json in the run directory covers every model. The harness itself writes
+    <model_dir>.<run_id>.json in its working directory, beside logs/run_evaluation.
+    """
+    found = []
+    if (run / "results.json").is_file():
+        found.append(("results.json", run / "results.json", models))
+    if run.parent.name == "run_evaluation" and run.parent.parent.name == "logs":
+        tail = f".{run.name}.json"
+        for file in sorted(run.parent.parent.parent.glob("*" + tail)):
+            if file.is_file() and file.name != tail:
+                found.append((file.name, file, [run / file.name[:-len(tail)]]))
+    return found
+
+
 def _summary(run: Path, prefix: str, models: list[Path], seen: set, records: list, warnings: list) -> None:
-    file = run / "results.json"
-    if not file.is_file():
-        warnings.append(f"{prefix}results.json: not present, so empty patches and harness errors without an "
-                        "instance directory are not visible.")
-        return
+    files = _summaries(run, models)
+    if not files:
+        beside = run.parent.name == "run_evaluation" and run.parent.parent.name == "logs"
+        warnings.append(f"{prefix}results.json: not present, " +
+                        (f"and no <model>.{run.name}.json beside logs/, " if beside else "") +
+                        "so empty patches and harness errors without an instance directory are not visible.")
+    for name, file, covered in files:
+        _read_summary(run, prefix, f"{prefix}{name}", file, covered, seen, records, warnings)
+
+
+def _read_summary(run: Path, prefix: str, name: str, file: Path, models: list[Path], seen: set, records: list,
+                  warnings: list) -> None:
     try:
         summary = json.loads(file.read_text(encoding="utf-8"))
         if not isinstance(summary, dict):
             raise ValueError
     except (OSError, ValueError):
-        warnings.append(f"{prefix}results.json: unreadable result file skipped (not a UTF-8 JSON object).")
+        warnings.append(f"{name}: unreadable result file skipped (not a UTF-8 JSON object).")
         return
     lost = 0
     for key in ("empty_patch_ids", "error_ids"):
@@ -185,16 +225,16 @@ def _summary(run: Path, prefix: str, models: list[Path], seen: set, records: lis
                     records.append(_record(run.name, model.name, task, run_id=run.name, output=None, score=None,
                                            judge_reasoning="", error="no report.json", error_kind="unknown"))
     if lost:
-        warnings.append(f"{prefix}results.json: {lost} empty-patch or error ids could not be tied to a model "
+        warnings.append(f"{name}: {lost} empty-patch or error ids could not be tied to a model "
                         "directory and were skipped.")
     incomplete = summary.get("incomplete_ids")
     if isinstance(incomplete, list) and incomplete:
-        warnings.append(f"{prefix}results.json: {len(incomplete)} instances have no prediction (incomplete_ids) "
+        warnings.append(f"{name}: {len(incomplete)} instances have no prediction (incomplete_ids) "
                         "and are not in the report.")
 
 
 def load(path: Path) -> tuple[list[Record], list[str]]:
-    root = path.resolve()
+    root = _base(path.resolve())
     records, warnings = [], []
     runs = _runs(root)
     if root not in runs and (root / "results.json").is_file():
@@ -242,7 +282,7 @@ def merge(loaded: list[tuple[Path, list[Record]]]) -> tuple[list[Record], list[s
     by_run: dict[Path, list[Record]] = {}
     warnings = []
     for source, records in loaded:
-        root = source.resolve()
+        root = _base(source.resolve())
         here = {run.name: run.resolve() for run in _runs(root)}
         fresh: dict[str, list[Record]] = {}
         for record in records:
