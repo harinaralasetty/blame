@@ -47,7 +47,7 @@ def _metrics(rows: list[dict], detectors: bool) -> dict:
     for label in CLASSES:
         tp = fp = fn = 0
         for row in rows:
-            predicted = (label in row["detectors"] if detectors and label != "genuine_failure"
+            predicted = (label in row["detectors"] if detectors and label != CLASSES[-1]
                          else row["predicted_label"] == label)
             actual = row["human_label"] == label
             tp += predicted and actual
@@ -82,7 +82,7 @@ def _read_labels(reader: csv.DictReader) -> tuple[list[dict], int]:
                 or any(label not in CLASSES[:-1] for label in detectors)
                 or len(detectors) != len(set(detectors))):
             raise ValueError(f"CSV row {number}: invalid label; allowed human labels: {', '.join(CLASSES)}")
-        expected = next((label for label in CLASSES[:-1] if label in detectors), "genuine_failure")
+        expected = next((label for label in CLASSES[:-1] if label in detectors), CLASSES[-1])
         if prediction != expected:
             raise ValueError(f"CSV row {number}: prediction disagrees with detector precedence")
         if not human:

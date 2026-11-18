@@ -17,4 +17,4 @@ dependencies = []
 blame = "blame_cli.cli:main"
 
 [tool.setuptools]
-packages = ["blame_cli"]
+packages = ["blame_cli", "blame_cli.formats"]

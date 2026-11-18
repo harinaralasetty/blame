@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "scored_items": 2,
+  "lost_items": 2,
+  "lost_points": 1.5,
+  "counting": "Each scored observation below 1 is a lost item, including repeated judges.",
+  "confidence_note": "Confidence values are fixed heuristic strengths, not calibrated probabilities.",
+  "warnings": [],
+  "by_class": [
+    {
+      "class": "infra",
+      "lost_items": 0,
+      "lost_points": 0
+    },
+    {
+      "class": "judge_unstable",
+      "lost_items": 0,
+      "lost_points": 0
+    },
+    {
+      "class": "item_everyone_loses",
+      "lost_items": 0,
+      "lost_points": 0
+    },
+    {
+      "class": "unstated_requirement",
+      "lost_items": 0,
+      "lost_points": 0
+    },
+    {
+      "class": "genuine_failure",
+      "lost_items": 2,
+      "lost_points": 1.5
+    }
+  ],
+  "by_model": [
+    {
+      "model": "synthetic/alpha",
+      "scored_items": 2,
+      "lost_items": 2,
+      "lost_points": 1.5,
+      "infra": 0,
+      "judge_unstable": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "genuine_failure": 2
+    }
+  ],
+  "items": [
+    {
+      "record_id": "ae5421ea31b067c047a978aeb5d074f07d09c81905c3d2c092650e803d68a994",
+      "record": {
+        "task_id": "color:sample",
+        "model": "synthetic/alpha",
+        "run_id": "inspect-generation-1/epoch-1",
+        "instruction": "Answer with the word blue. Explain briefly.",
+        "rubric_item_id": "blue",
+        "rubric_item_text": "Must include \"blue\".",
+        "output": "Green is my choice.",
+        "score": 0.0,
+        "judge_reasoning": "The response says green rather than blue.",
+        "judge_run": 1,
+        "error": null
+      },
+      "label": "genuine_failure",
+      "confidence": 0.5,
+      "evidence": {
+        "score": 0.0,
+        "rubric_quote": "Must include \"blue\".",
+        "output_quote": "Green is my choice.",
+        "judge_reasoning_quote": "The response says green rather than blue.",
+        "note": "No precision-first detector fired. Default, not a proven model failure."
+      },
+      "matches": []
+    },
+    {
+      "record_id": "642a10155b9dafd101dd65d7c6e375e5b8e0449f25c75131d1cee2713b086b23",
+      "record": {
+        "task_id": "color:sample",
+        "model": "synthetic/alpha",
+        "run_id": "inspect-generation-1/epoch-1",
+        "instruction": "Answer with the word blue. Explain briefly.",
+        "rubric_item_id": "explain",
+        "rubric_item_text": "Explain briefly.",
+        "output": "Green is my choice.",
+        "score": 0.5,
+        "judge_reasoning": "The explanation is incomplete.",
+        "judge_run": 1,
+        "error": null
+      },
+      "label": "genuine_failure",
+      "confidence": 0.5,
+      "evidence": {
+        "score": 0.5,
+        "rubric_quote": "Explain briefly.",
+        "output_quote": "Green is my choice.",
+        "judge_reasoning_quote": "The explanation is incomplete.",
+        "note": "No precision-first detector fired. Default, not a proven model failure."
+      },
+      "matches": []
+    }
+  ]
+}

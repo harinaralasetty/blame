@@ -5,7 +5,7 @@ from dataclasses import asdict
 import re
 from typing import Protocol, Sequence
 
-from .model import Finding, Record
+from .model import CLASSES, Finding, Record
 
 
 # The single source of truth for infrastructure rules, including non-regex rules.
@@ -164,12 +164,12 @@ def triage(records: Sequence[Record], reasoner: Reasoner | None = None) -> list[
     for record in records:
         if record.score == 1:
             continue
-        findings = [f for f in (
+        findings = sorted((f for f in (
             infra(record), _judge_finding(record, judge_summaries[record.judge_key]),
             item_everyone_loses(record, by_item[record.item_key]),
             unstated_requirement(record, reasoner),
-        ) if f is not None]
-        selected = findings[0] if findings else Finding("genuine_failure", 0.50, {
+        ) if f is not None), key=lambda f: CLASSES.index(f.label))
+        selected = findings[0] if findings else Finding(CLASSES[-1], 0.50, {
             "score": record.score, "rubric_quote": record.rubric_item_text,
             "output_quote": record.output, "judge_reasoning_quote": record.judge_reasoning,
             "note": "No precision-first detector fired. Default, not a proven model failure.",

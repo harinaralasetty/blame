@@ -6,10 +6,23 @@ import json
 import math
 
 
-CLASSES = (
-    "infra", "judge_unstable", "item_everyone_loses",
-    "unstated_requirement", "genuine_failure",
+@dataclass(frozen=True)
+class LabelInfo:
+    name: str
+    category: str
+    next_step: str
+
+
+# The only source of precedence: the first label here with a finding is the verdict.
+# The last label is the default when no detector fires.
+LABELS = (
+    LabelInfo("infra", "infra", "Rerun the attempt after checking the recorded error or output."),
+    LabelInfo("judge_unstable", "grader", "Compare the gradings of this output before trusting either score."),
+    LabelInfo("item_everyone_loses", "task", "Check the task and its checks against a known-good solution."),
+    LabelInfo("unstated_requirement", "instruction", "Check whether the instruction states what the rubric requires."),
+    LabelInfo("genuine_failure", "unexplained", "Read the output and the grader note; no rule explains this loss."),
 )
+CLASSES = tuple(label.name for label in LABELS)
 
 
 @dataclass(frozen=True)
