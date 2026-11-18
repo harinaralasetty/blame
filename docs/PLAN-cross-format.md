@@ -325,7 +325,7 @@ Model, report and detectors (M1 to M3):
 - The `error_kind` consistency check is keyed on the attempt and `judge_run`, so two gradings of one output may record different classes.
 - `item_everyone_loses` keeps records that a 0.1.0 `infra` rule matches in its cohort, as 0.1.0 did (needed for unchanged v1 output); the reference rules and `attempts_flip` leave them out. Records with `error_kind` `infra`, `setup` or `grader` are left out everywhere, as planned.
 - `by_task[].primary_label` is the most frequent headline label on the task.
-- The reference sentence counts scored reference records. The task-version filter for reference rules is also applied to `reference_flaky`.
+- The reference sentence counted scored reference records until the check fixes below. The task-version filter for reference rules is also applied to `reference_flaky`.
 - The plan's fixture label for `fixtures/v2.jsonl` is in a sibling file `fixtures/v2.README.md` ("Hand-written, not harness output."), because JSONL has no comment syntax and no commit applies.
 - The Arena-Hard totals test was added in M1, not M3, so every milestone is checked by it.
 - `realdata/FINDINGS.md` has its test count updated at each milestone.
@@ -336,15 +336,15 @@ Harbor (M4):
 - `RegradeError` (kind `unknown`) is treated as not having a counted reward, as in Harbor's table; the plan's "unlisted name = usable" covers names outside the table only.
 - `policy_override.has_valid_reward` decides whether the reward counts when neither `reward_valid` nor `exception_info.policy` is present.
 - `run_id` is the bare trial name when `id` is missing.
-- A trial file with a wrong field type (for example an empty `task_name`) is a `ValueError` naming the file; only files that are not JSON objects are skipped with a warning.
+- A trial file with a wrong field type (for example an empty `task_name`) was a `ValueError` naming the file; replaced by skip-with-warning in the check fixes below.
 - After `merge`, the records of a merged format sit at the position of that format's first input.
 - The fixture has two tasks and both have a reference problem, so `unclassified_error`, `attempts_flip` and `item_everyone_loses` appear there as secondary matches, not as headlines.
-- `redact` lives in `blame_cli/formats/__init__.py`, the only place both readers can import it from without a new module.
+- `redact` lived in `blame_cli/formats/__init__.py`; moved to `blame_cli/formats/_text.py` in the check fixes below.
 
 SWE-bench (M5):
-- A `report.json` that is not a report for its instance is skipped with one warning (the plan's general rule), not turned into an ungraded record, although the harness lists such an instance in `error_ids`.
+- A `report.json` that is not a report for its instance is skipped with one warning (the plan's general rule). Since the check fixes below it is still reported as not graded when `results.json` lists it in `error_ids`.
 - `infra_failure: true` with no reason gives the error text "SWE-bench log pattern: no reason recorded".
-- A run directory is recognised by a valid `report.json` two levels down or by a `results.json`, so a run with only a summary can be read with `--format swebench`.
+- A run directory is recognised by a valid `report.json` two levels down, or by a `results.json` where no report says otherwise, so a run with only a summary and a model directory can be read with `--format swebench`.
 - With `--format auto` detection, a missing `patch.diff` warns for ungraded instances too.
 - Warnings name files relative to the given path; the same run given directly or through its parent has the same items and different warning prefixes.
 - An id in `results.json` that is not a plain directory name is ignored.
@@ -354,4 +354,16 @@ Release (M6):
 - `.gitignore` gained `demo-harbor/` and `demo-swebench/`, the output directories the README quickstart writes.
 - The README keeps its existing structure; it was not restyled to the house template.
 - The README commands that create a virtual environment and install the package were not run (no installs and no network in the build session); the `./blame`, `python3 -m blame_cli` and `make` commands were.
+
+Fixes after the independent check (`docs/CHECK-cross-format.md`):
+- The reader hook is `merge(loaded)`, taking `(input path, records)` pairs instead of a flat record list, because a job is identified by its resolved run directory and not by a name carried on the record.
+- New module `blame_cli/formats/_text.py` holds `redact`, `clip` and the two caps (2,000 characters of error text, 20,000 of a patch). The plan had no caps.
+- SWE-bench `job_id` is the run directory name, extended with parent directory names only when two different run directories share a name. The plan said the directory name.
+- An ungraded attempt with `error_kind: "agent"` gets `unclassified_error`; no twelfth label was added. The label's `next_step` wording changed to cover it.
+- A bad Harbor trial and a `report.json` with a `resolved` that is not true or false are skipped with a warning; both were errors before. Detection of a SWE-bench report now also requires a true or false `resolved`.
+- A white-space-only or empty `patch.diff` without a report is treated as an empty patch (score 0, `error_kind: "agent"`), the one treatment the check asked for.
+- `inputs.load_inputs` reports `TypeError`, `AttributeError` and `KeyError` as input errors only for the two 0.1.0 formats, whose 0.1.0 behaviour that is; for `harbor` and `swebench` they are raised as reader bugs.
+- `detectors.judge_unstable(record, peers)` is kept although `triage` does not call it: the unmodified 0.1.0 test file `tests/test_detectors.py` does.
+- `by_class` keeps the precedence-table order; the 0.1.0 order cannot be restored without a second ordering, so the change is documented in `docs/reference.md`.
+- Check findings 9, 13, 14, 16 and 18 were left and are listed under "Known limitations" in `docs/reference.md`. Finding 15 (symlinked run) was fixed with finding 2.
 

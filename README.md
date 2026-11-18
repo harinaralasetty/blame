@@ -46,7 +46,7 @@ The format is detected per input; `--format` forces one. The Harbor and SWE-benc
 ./blame report fixtures/swebench-eval --out demo-swebench
 ```
 
-Reports copy error messages, test output, log lines and patches from the result files. Home-directory paths in that text are shortened to `~` and nothing else is removed, so read a report before sharing it. Harbor's own `harbor analyze` has a model read each trial against a rubric; blame makes no model calls and only sorts what the result files already record.
+Reports copy error messages, test output, log lines and patches from the result files. Absolute home-directory paths in that text are shortened to `~`, error text is cut after 2,000 characters and a patch after 20,000, and nothing else is removed, so read a report before sharing it. Harbor's own `harbor analyze` has a model read each trial against a rubric; blame makes no model calls and only sorts what the result files already record.
 
 Binary Inspect `.eval` files, tool-only outputs and the SWE-bench public submissions layout are unsupported. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation. Optional keys can name the agent, mark a reference-solution run, carry the harness error class and mark an attempt as never graded (`score: null`).
 

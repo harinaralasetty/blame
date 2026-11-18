@@ -21,7 +21,7 @@ where an entry below says "Behaviour change".
   inputs.
 - Markdown and HTML reports gain a "Failed tasks" section, group by system (agent
   and model) and print `confidence` as "rule strength".
-- `report` and `label` accept `--format auto|generic|inspect`.
+- `report` and `label` accept `--format auto|generic|harbor|inspect|swebench`.
 - Six new labels, eleven in all: `setup_error`, `grader_error`, `reference_flaky`,
   `reference_fails`, `attempts_flip`, `unclassified_error`. `by_class`, each
   `by_model` row and the `blame score` output grow by these six keys; `human_label`
@@ -52,6 +52,32 @@ where an entry below says "Behaviour change".
 - CI also runs on Python 3.14.
 - A directory as `IN` is no longer always an error; a directory no reader
   recognises is still one, and the message says what was looked for.
+
+Fixes from the independent check (`docs/CHECK-cross-format.md`), before release:
+
+- SWE-bench: the layout decides what a run directory is. A `results.json` beside the
+  run directories no longer hides them; it is not read, with a warning.
+- SWE-bench: a run is its resolved directory. Two runs with one name under different
+  parents get job names such as `p1/run` and `p2/run` and their gradings of one patch
+  are paired; a run supplied twice, also through a symbolic link, is read once.
+- Harbor: a trial supplied more than once is kept once with a warning, whatever the
+  job directories are called.
+- An attempt with no score never gets `genuine_failure`: with `error_kind: "agent"`
+  it is `unclassified_error`. The Harbor error text no longer contradicts itself when
+  a recorded policy overrules `policy_override`.
+- `by_task[].reference` counts the reference attempts the reference rules used, and
+  says how many were left out.
+- Path shortening only touches absolute home paths; `src/home/views.py` in a patch
+  and URLs are unchanged.
+- SWE-bench: an empty or white-space-only `patch.diff` is treated like an id in
+  `empty_patch_ids` (`error_kind: "agent"`, score 0), not as `infra`.
+- A bad Harbor trial or SWE-bench `report.json` (wrong field types included) is
+  skipped with a warning naming the file instead of stopping the run; an instance
+  listed in `error_ids` is still reported as not graded. Wrong `tests_status` types
+  are ignored with a warning. The "no readable result" errors list the warnings.
+- Copied error text is cut after 2,000 characters and a patch after 20,000.
+- `make demo` also builds `demo-harbor` and `demo-swebench`. `docs/reference.md`
+  gained "Known limitations" and states that the row order of `by_class` changed.
 
 ## 0.1.0
 

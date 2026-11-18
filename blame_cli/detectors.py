@@ -231,6 +231,11 @@ def grader_error(record: Record) -> Finding | None:
 
 
 def unclassified_error(record: Record) -> Finding | None:
+    if record.score is None and record.error_kind == "agent":
+        # Never graded, so the default label (a graded loss no rule explains) would be false.
+        return Finding("unclassified_error", 0.40, {
+            "observed": "The harness recorded an agent-side error and no score, so the results do not say "
+                        "whether this attempt would have passed.", "error": record.error})
     return _error_finding(record, "unknown", "unclassified_error", 0.40,
                           "The harness recorded an error that the format does not classify.")
 
@@ -239,6 +244,21 @@ def _references(record: Record, index: Index) -> list[Record]:
     """Usable reference results for this check, leaving out other task versions."""
     return [p for p in index.references.get(record.item_key, ())
             if None in (p.task_version, record.task_version) or p.task_version == record.task_version]
+
+
+def reference_attempts(task_records: Sequence[Record], index: Index) -> tuple[int, int, int]:
+    """Reference attempts of one task: passed, used and supplied.
+
+    Used means the reference detectors read the attempt for at least one failed candidate
+    result of the task, so this count and their findings cannot disagree.
+    """
+    failed = [r for r in task_records if r.role == "candidate" and r.score != 1]
+    used: dict[tuple, bool] = {}
+    for record in failed:
+        for p in _references(record, index):   # an attempt passes when every result of it that was used passes
+            used[p.attempt_key] = used.get(p.attempt_key, True) and p.score == 1
+    supplied = {r.attempt_key for r in task_records if r.role != "candidate"}
+    return sum(used.values()), len(used), len(supplied)
 
 
 def _reference_runs(references: Sequence[Record]) -> list[dict]:

@@ -62,7 +62,7 @@ eval-loss-triage: HTTP 404
 
 ### Test suite
 
-Actual final command output, exit 0:
+Actual final command output for 0.1.0 (45 tests), exit 0. The suite has grown since: 0.2.0 runs 160 tests; `make test` prints the current list.
 
 ```text
 $ make test

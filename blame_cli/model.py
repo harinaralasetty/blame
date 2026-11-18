@@ -25,7 +25,7 @@ LABELS = (
     LabelInfo("item_everyone_loses", "task", "Check the task and its checks against a known-good solution."),
     LabelInfo("unstated_requirement", "instruction", "Check whether the instruction states what the rubric requires."),
     LabelInfo("attempts_flip", "unexplained", "Compare a passing and a failing attempt of this system; the results do not say why they differ."),
-    LabelInfo("unclassified_error", "unexplained", "Read the recorded error; the format does not classify it."),
+    LabelInfo("unclassified_error", "unexplained", "Read the recorded error; the result files do not say what it means for this attempt."),
     LabelInfo("genuine_failure", "unexplained", "Read the output and the grader note; no rule explains this loss."),
 )
 CLASSES = tuple(label.name for label in LABELS)

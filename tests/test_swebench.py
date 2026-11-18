@@ -112,8 +112,11 @@ class MappingTests(Case):
 
     def test_resolved_must_be_a_boolean(self):
         write_instance(self.run, resolved="yes")
-        with self.assertRaisesRegex(ValueError, r"^org__model/proj__lib-1/report.json: resolved must be true or false$"):
-            self.load()
+        write_instance(self.run, task="proj__lib-2")
+        records, warnings = self.load()
+        self.assertEqual([r.task_id for r in records], ["proj__lib-2"])
+        self.assertEqual(warnings, ["org__model/proj__lib-1/report.json: unreadable result file skipped "
+                                    "(not a JSON report for this instance with a true or false resolved value)."])
 
     def test_log_pattern_flags(self):
         flagged = self.one(patch_successfully_applied=False, infra_failure=True, infra_failure_reason="out_of_memory")
@@ -151,11 +154,10 @@ class MappingTests(Case):
     def test_unreadable_report_is_skipped_with_one_warning(self):
         write_instance(self.run)
         write_instance(self.run, task="proj__lib-2", report="{")
-        write_summary(self.run, error_ids=["proj__lib-2"])
         records, warnings = self.load()
         self.assertEqual([r.task_id for r in records], ["proj__lib-1"])
         self.assertEqual(warnings, ["org__model/proj__lib-2/report.json: unreadable result file skipped "
-                                    "(not a JSON report for this instance)."])
+                                    "(not a JSON report for this instance with a true or false resolved value)."])
 
     def test_patch_text_is_redacted_but_the_run_id_hashes_the_file(self):
         patch = PATCH + "+# see /Users/somebody/notes.txt\n"
@@ -168,7 +170,8 @@ class SummaryTests(Case):
     def test_missing_summary_warns(self):
         write_instance(self.run)
         _, warnings = self.load(summary=False)
-        self.assertEqual(warnings, ["no results.json; empty patches and harness errors without an instance directory are not visible."])
+        self.assertEqual(warnings, ["results.json: not present, so empty patches and harness errors without an instance directory "
+                                    "are not visible."])
         (self.run / "results.json").write_text("[]", encoding="utf-8")
         _, warnings = self.load()
         self.assertEqual(warnings, ["results.json: unreadable result file skipped (not a UTF-8 JSON object)."])
@@ -236,11 +239,11 @@ class FixtureTests(unittest.TestCase):
         report = build_report(records, [w.replace(str(FIXTURE), "fixtures/swebench-eval") for w in warnings])
         check_golden(self, "swebench", report)
         self.assertEqual((report["scored_items"], report["lost_items"], report["ungraded_items"], report["reference_items"]),
-                         (7, 6, 2, 2))
-        self.assertEqual(len(report["warnings"]), 4)
+                         (7, 6, 3, 2))
+        self.assertEqual(len(report["warnings"]), 5)
         labels = [item["label"] for item in report["items"]]
         self.assertEqual({label: labels.count(label) for label in set(labels)},
-                         {"judge_unstable": 1, "reference_fails": 2, "infra": 1, "unclassified_error": 3, "genuine_failure": 1})
+                         {"judge_unstable": 1, "reference_fails": 2, "infra": 1, "unclassified_error": 4, "genuine_failure": 1})
         text = json.dumps(report) + markdown(report) + static_html(report)
         for word in ("/home/", "/Users/"):
             self.assertNotIn(word, text)
@@ -252,7 +255,7 @@ class FixtureTests(unittest.TestCase):
                 result = subprocess.run([sys.executable, "-m", "blame_cli", "report", *inputs, "--out", tmp],
                                         cwd=ROOT, text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertIn("6 lost items, 2 ungraded", result.stdout)
+                self.assertIn("6 lost items, 3 ungraded", result.stdout)
                 self.assertIn("judge_unstable", (Path(tmp) / "report.md").read_text(encoding="utf-8"))
             help_text = subprocess.run([sys.executable, "-m", "blame_cli", "report", "--help"], cwd=ROOT, text=True,
                                        capture_output=True).stdout

@@ -184,8 +184,10 @@ class MappingTests(Case):
 
     def test_structural_errors_name_the_file(self):
         write_trial(self.job, task_name="")
-        with self.assertRaisesRegex(ValueError, r"^task__t1/result.json: task_name must be a non-empty string$"):
-            harbor.load(self.job)
+        write_trial(self.job, "task__t2", id="12345678-0000")
+        records, warnings = harbor.load(self.job)
+        self.assertEqual([r.run_id for r in records], ["task__t2@12345678"])
+        self.assertEqual(warnings, ["task__t1/result.json: trial skipped (task_name must be a non-empty string)."])
 
     def test_unreadable_result_is_skipped_with_one_warning(self):
         write_trial(self.job)
@@ -204,14 +206,15 @@ class MergeTests(Case):
         write_trial(self.job.parent / "job-2")
         records, warnings = load_inputs([str(self.job), str(self.job.parent / "job-2")])
         self.assertEqual([r.job_id for r in records], ["job-1"])
-        self.assertEqual(warnings, ["Harbor trial task__t1@abcdef12 of task task appears under jobs job-1 and job-2; "
+        self.assertEqual(warnings, ["Harbor trial task__t1@abcdef12 of task task was supplied more than once; "
                                     "the first copy is kept."])
 
-    def test_the_same_directory_twice_is_a_plain_duplicate(self):
+    def test_the_same_directory_twice_is_kept_once(self):
         write_trial(self.job)
         records, warnings = load_inputs([str(self.job), str(self.job)])
         self.assertEqual(len(records), 1)
-        self.assertRegex(warnings[0], "duplicate record [0-9a-f]{12} ignored")
+        self.assertEqual(warnings, ["Harbor trial task__t1@abcdef12 of task task was supplied more than once; "
+                                    "the first copy is kept."])
 
     def test_mixed_task_checksums_warn(self):
         write_trial(self.job)

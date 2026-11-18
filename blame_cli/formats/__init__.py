@@ -1,25 +1,16 @@
 """Input formats. Each reader module turns one path into validated records.
 
 A reader defines detect(path) -> bool and load(path) -> (records, warnings), and may
-define merge(records) -> (records, warnings), applied once over all inputs of its format.
+define merge(loaded) -> (records, warnings), applied once over the (path, records) pairs of all
+inputs of its format.
 Readers import only the model, never detectors or reports.
 """
 
 from pathlib import Path
-import re
 
 from ..model import Record
-
-
-_HOME = re.compile(r"""(?:/Users/|/home/|[A-Za-z]:\\Users\\)[^/\\\s"'<>:;,)]+""")
-
-
-def redact(text: str) -> str:
-    """Replace home-directory prefixes with "~". Everything else is kept verbatim."""
-    return _HOME.sub("~", text)
-
-
-from . import generic, harbor, inspect_json, swebench  # noqa: E402  (readers import redact from this module)
+from . import generic, harbor, inspect_json, swebench
+from ._text import redact  # noqa: F401  (part of this package's interface)
 
 
 # Detection order: the first reader whose detect() accepts the path wins.
@@ -32,7 +23,10 @@ def detect_format(path: Path) -> str:
         found = next((name for name, reader in READERS.items() if reader.detect(path)), None)
         if found is None:
             probes = "; ".join(reader.PROBE for reader in READERS.values() if hasattr(reader, "PROBE"))
-            raise ValueError(f"no reader recognises this directory. Looked for: {probes}")
+            near = sorted(file.relative_to(path).as_posix() for depth in range(4) for name in ("result.json", "report.json")
+                          for file in path.glob("*/" * depth + name))
+            hint = f" Found {near[0]}, which could not be read as either." if near else ""
+            raise ValueError(f"no reader recognises this directory. Looked for: {probes}.{hint}")
         return found
     if path.suffix == ".eval":
         raise ValueError("binary .eval files are unsupported; use Inspect text JSON")

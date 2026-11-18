@@ -232,7 +232,7 @@ detectors until they produce more flattering results.
 Four adapter tests check every score/order mapping, rejection of missing scores,
 rejection of stale prompt/answer joins, unchanged-generation identity, and the
 difference between the same actual winner after a swap versus a genuine reversal.
-`make test` passes **129 tests**. Any later detector fix should have a failing
+`make test` passes **160 tests**. Any later detector fix should have a failing
 regression test first, as requested.
 
 ## Implications for the README and LinkedIn story

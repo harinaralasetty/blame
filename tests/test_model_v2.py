@@ -103,7 +103,7 @@ class ReportV2Tests(unittest.TestCase):
     def test_task_table_without_reference_and_with_ungraded_reference(self):
         self.assertEqual(build_report([bare()])["by_task"][0]["reference"], "no reference run supplied")
         report = build_report([bare(), bare(agent="oracle", role="reference", score=None, error="x")])
-        self.assertEqual(report["by_task"][0]["reference"], "passed 0 of 0 attempts; 1 not graded")
+        self.assertEqual(report["by_task"][0]["reference"], "no usable reference attempt; 1 left out (harness error, not graded or another task version)")
         self.assertEqual(build_report([bare(score=1.0)])["by_task"], [])
 
     def test_missing_text_fields_pass_through_all_three_renderers(self):

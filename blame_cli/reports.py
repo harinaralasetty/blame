@@ -5,7 +5,7 @@ import html
 import json
 from pathlib import Path
 
-from .detectors import triage
+from .detectors import build_index, reference_attempts, triage
 from .model import CLASSES, LABELS, system_name
 
 
@@ -22,15 +22,16 @@ def _lost(items) -> dict:
             "ungraded_items": len(items) - len(scored)}
 
 
-def _reference_text(references) -> str:
-    if not references:
+def _reference_text(passed: int, used: int, supplied: int) -> str:
+    """The reference attempts the reference detectors used, and how many they left out."""
+    if not supplied:
         return "no reference run supplied"
-    scored = [r for r in references if r.score is not None]
-    text = f"passed {sum(r.score == 1 for r in scored)} of {len(scored)} attempts"
-    return text + (f"; {len(references) - len(scored)} not graded" if len(scored) != len(references) else "")
+    left = f"; {supplied - used} left out (harness error, not graded or another task version)" if supplied > used else ""
+    return (f"passed {passed} of {used} attempts" if used else "no usable reference attempt") + left
 
 
 def _by_task(records, verdicts) -> list[dict]:
+    index = build_index(records)
     by_task = defaultdict(list)
     for record in records:
         by_task[record.task_id].append(record)
@@ -49,7 +50,7 @@ def _by_task(records, verdicts) -> list[dict]:
             "task_id": task,
             "systems_attempted": len({r.system for r in candidates}),
             "systems_failed": len({r.system for r in candidates if r.score is not None and r.score < 1}),
-            "reference": _reference_text([r for r in by_task[task] if r.role == "reference"]),
+            "reference": _reference_text(*reference_attempts(by_task[task], index)),
             "labels": {label: findings[label] for label in CLASSES if findings[label]},
             "primary_label": primary, "category": info.category,
             "max_confidence": max(v["confidence"] for v in items if v["label"] == primary),

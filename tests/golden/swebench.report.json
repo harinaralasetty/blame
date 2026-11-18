@@ -3,14 +3,15 @@
   "scored_items": 7,
   "lost_items": 6,
   "lost_points": 6.0,
-  "ungraded_items": 2,
+  "ungraded_items": 3,
   "reference_items": 2,
-  "counting": "Each scored observation below 1 is a lost item, including repeated judges. 2 attempts were never graded and are listed as ungraded.",
+  "counting": "Each scored observation below 1 is a lost item, including repeated judges. 3 attempts were never graded and are listed as ungraded.",
   "confidence_note": "Confidence values are fixed heuristic strengths, not calibrated probabilities.",
   "warnings": [
     "fixtures/swebench-eval: run-a/results.json: 2 instances have no prediction (incomplete_ids) and are not in the report.",
     "fixtures/swebench-eval: run-b/example__model-a/example__widgets-108: no patch.diff; the run id run-b stands in for the patch.",
-    "fixtures/swebench-eval: run-b/example__model-a/example__widgets-110/report.json: unreadable result file skipped (not a JSON report for this instance).",
+    "fixtures/swebench-eval: run-b/example__model-a/example__widgets-110/report.json: unreadable result file skipped (not a JSON report for this instance with a true or false resolved value).",
+    "fixtures/swebench-eval: run-b/example__model-a/example__widgets-110: no patch.diff; the run id run-b stands in for the patch.",
     "fixtures/swebench-eval: run-b/results.json: 1 empty-patch or error ids could not be tied to a model directory and were skipped."
   ],
   "by_class": [
@@ -82,7 +83,7 @@
       "category": "unexplained",
       "lost_items": 1,
       "lost_points": 1.0,
-      "ungraded_items": 2
+      "ungraded_items": 3
     },
     {
       "class": "genuine_failure",
@@ -98,7 +99,7 @@
       "scored_items": 7,
       "lost_items": 6,
       "lost_points": 6.0,
-      "ungraded_items": 2,
+      "ungraded_items": 3,
       "infra": 1,
       "setup_error": 0,
       "grader_error": 0,
@@ -108,7 +109,7 @@
       "item_everyone_loses": 0,
       "unstated_requirement": 0,
       "attempts_flip": 0,
-      "unclassified_error": 3,
+      "unclassified_error": 4,
       "genuine_failure": 1
     }
   ],
@@ -163,7 +164,7 @@
       "primary_label": "unclassified_error",
       "category": "unexplained",
       "max_confidence": 0.4,
-      "next_step": "Read the recorded error; the format does not classify it."
+      "next_step": "Read the recorded error; the result files do not say what it means for this attempt."
     },
     {
       "task_id": "example__widgets-104",
@@ -189,7 +190,7 @@
       "primary_label": "unclassified_error",
       "category": "unexplained",
       "max_confidence": 0.4,
-      "next_step": "Read the recorded error; the format does not classify it."
+      "next_step": "Read the recorded error; the result files do not say what it means for this attempt."
     },
     {
       "task_id": "example__widgets-108",
@@ -202,7 +203,20 @@
       "primary_label": "unclassified_error",
       "category": "unexplained",
       "max_confidence": 0.4,
-      "next_step": "Read the recorded error; the format does not classify it."
+      "next_step": "Read the recorded error; the result files do not say what it means for this attempt."
+    },
+    {
+      "task_id": "example__widgets-110",
+      "systems_attempted": 1,
+      "systems_failed": 0,
+      "reference": "no reference run supplied",
+      "labels": {
+        "unclassified_error": 1
+      },
+      "primary_label": "unclassified_error",
+      "category": "unexplained",
+      "max_confidence": 0.4,
+      "next_step": "Read the recorded error; the result files do not say what it means for this attempt."
     }
   ],
   "items": [
@@ -520,6 +534,40 @@
           "evidence": {
             "observed": "The harness recorded an error that the format does not classify.",
             "error": "SWE-bench log pattern: no_tests_collected"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "498052e2f440405fdad79eea5bd72c8159c23d27f88cc8ad09d48c6b47e7d71c",
+      "record": {
+        "task_id": "example__widgets-110",
+        "model": "example__model-a",
+        "run_id": "run-b",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "report.json could not be read",
+        "error_kind": "unknown",
+        "job_id": "run-b"
+      },
+      "label": "unclassified_error",
+      "confidence": 0.4,
+      "evidence": {
+        "observed": "The harness recorded an error that the format does not classify.",
+        "error": "report.json could not be read"
+      },
+      "matches": [
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "report.json could not be read"
           }
         }
       ]

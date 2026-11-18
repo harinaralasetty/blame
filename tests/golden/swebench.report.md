@@ -1,8 +1,8 @@
 # blame report
 
-Scored observations: 7. Lost items: 6. Lost points: 6. Ungraded attempts: 2. Reference results (not counted): 2.
+Scored observations: 7. Lost items: 6. Lost points: 6. Ungraded attempts: 3. Reference results (not counted): 2.
 
-Each scored observation below 1 is a lost item, including repeated judges. 2 attempts were never graded and are listed as ungraded.
+Each scored observation below 1 is a lost item, including repeated judges. 3 attempts were never graded and are listed as ungraded.
 
 Confidence values are fixed heuristic strengths, not calibrated probabilities.
 
@@ -19,20 +19,21 @@ Confidence values are fixed heuristic strengths, not calibrated probabilities.
 | item_everyone_loses | task | 0 | 0 | 0 |
 | unstated_requirement | instruction | 0 | 0 | 0 |
 | attempts_flip | unexplained | 0 | 0 | 0 |
-| unclassified_error | unexplained | 1 | 1.0 | 2 |
+| unclassified_error | unexplained | 1 | 1.0 | 3 |
 | genuine_failure | unexplained | 1 | 1.0 | 0 |
 
 ## By model
 
 | model | scored_items | lost_items | lost_points | ungraded_items | infra | setup_error | grader_error | judge_unstable | reference_flaky | reference_fails | item_everyone_loses | unstated_requirement | attempts_flip | unclassified_error | genuine_failure |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| example__model-a | 7 | 6 | 6.0 | 2 | 1 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 3 | 1 |
+| example__model-a | 7 | 6 | 6.0 | 3 | 1 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 4 | 1 |
 
 ## Input warnings
 
 - fixtures/swebench-eval: run-a/results.json: 2 instances have no prediction (incomplete_ids) and are not in the report.
 - fixtures/swebench-eval: run-b/example__model-a/example__widgets-108: no patch.diff; the run id run-b stands in for the patch.
-- fixtures/swebench-eval: run-b/example__model-a/example__widgets-110/report.json: unreadable result file skipped (not a JSON report for this instance).
+- fixtures/swebench-eval: run-b/example__model-a/example__widgets-110/report.json: unreadable result file skipped (not a JSON report for this instance with a true or false resolved value).
+- fixtures/swebench-eval: run-b/example__model-a/example__widgets-110: no patch.diff; the run id run-b stands in for the patch.
 - fixtures/swebench-eval: run-b/results.json: 1 empty-patch or error ids could not be tied to a model directory and were skipped.
 
 ## Failed tasks
@@ -44,10 +45,11 @@ One row per task with a lost or ungraded attempt. The label is the most frequent
 | example__widgets-101 | 1 | 1 | passed 1 of 1 attempts | judge_unstable | grader | 0.99 | judge_unstable 1 | Compare the gradings of this output before trusting either score. |
 | example__widgets-102 | 1 | 1 | passed 0 of 1 attempts | reference_fails | task | 0.60 | reference_fails 2 | Rerun the reference before scoring systems on this task. |
 | example__widgets-103 | 1 | 1 | no reference run supplied | infra | infra | 0.80 | infra 1 | Rerun the attempt after checking the recorded error or output. |
-| example__widgets-105 | 1 | 0 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the format does not classify it. |
+| example__widgets-105 | 1 | 0 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the result files do not say what it means for this attempt. |
 | example__widgets-104 | 1 | 1 | no reference run supplied | genuine_failure | unexplained | 0.50 | genuine_failure 1 | Read the output and the grader note; no rule explains this loss. |
-| example__widgets-106 | 1 | 0 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the format does not classify it. |
-| example__widgets-108 | 1 | 1 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the format does not classify it. |
+| example__widgets-106 | 1 | 0 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the result files do not say what it means for this attempt. |
+| example__widgets-108 | 1 | 1 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the result files do not say what it means for this attempt. |
+| example__widgets-110 | 1 | 0 | no reference run supplied | unclassified_error | unexplained | 0.40 | unclassified_error 1 | Read the recorded error; the result files do not say what it means for this attempt. |
 
 ## Lost item drill-down
 
@@ -226,5 +228,26 @@ error: <q>SWE-bench log pattern: no_tests_collected</q>
 
 - observed: <q>"The harness recorded an error that the format does not classify."</q>
 - error: <q>"SWE-bench log pattern: no_tests_collected"</q>
+
+Detector matches: unclassified_error
+
+### example__widgets-110 / example__model-a / resolved
+
+Verdict: unclassified_error; rule strength: 0.40; score: not graded; run: run-b; judge_run: None.
+
+Record: 498052e2f440405fdad79eea5bd72c8159c23d27f88cc8ad09d48c6b47e7d71c
+
+instruction: <q>not available in this format</q>
+
+rubric_item_text: <q>not available in this format</q>
+
+output: <q>not available in this format</q>
+
+judge_reasoning: <q></q>
+
+error: <q>report.json could not be read</q>
+
+- observed: <q>"The harness recorded an error that the format does not classify."</q>
+- error: <q>"report.json could not be read"</q>
 
 Detector matches: unclassified_error

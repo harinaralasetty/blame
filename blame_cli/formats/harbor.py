@@ -6,12 +6,13 @@ Only <trial>/result.json and <trial>/verifier/test-stdout.txt are read; `config`
 `trial_uri` and `exception_traceback` are never read.
 """
 
+from dataclasses import replace
 import json
 import math
 from pathlib import Path
 
 from ..model import Record, validate
-from . import redact
+from ._text import ERROR_CHARS, clip, redact
 
 
 PROBE = "Harbor (a result.json with trial_name and agent_info in the directory or up to two levels below it)"
@@ -88,7 +89,9 @@ def _exception(data: dict) -> dict | None:
     steps = data.get("step_results")
     found = [data.get("exception_info"),
              *(step.get("exception_info") for step in (steps if isinstance(steps, list) else ()) if isinstance(step, dict))]
-    return next((info for info in found if isinstance(info, dict)), None)
+    if any(info is not None and not isinstance(info, dict) for info in found):
+        raise ValueError("exception_info must be an object or null")
+    return next((info for info in found if info is not None), None)
 
 
 def _flag(data, key: str) -> bool | None:
@@ -104,17 +107,26 @@ def _failure(data: dict) -> tuple[str | None, str | None, bool]:
         return None, None, True if valid is None else valid
     name = _string(info, "exception_type")
     message = info.get("exception_message")
-    text = f"Harbor {name}: {redact(message)}" if isinstance(message, str) and message.strip() else f"Harbor {name}"
+    text = f"Harbor {name}"
+    if isinstance(message, str) and message.strip():
+        text += ": " + redact(clip(message, ERROR_CHARS))
     kind = ERROR_KIND_BY_NAME.get(name, "unknown")
     valid = name not in ERROR_KIND_BY_NAME or kind == "agent"   # an unlisted name keeps Harbor's default
+    # What Harbor recorded about the reward wins over the override: reward_valid, then the policy.
+    recorded = [(label, flag) for label, flag in (("reward_valid", _flag(data, "reward_valid")),
+                                                  ("the recorded policy", _flag(info.get("policy"), "has_valid_reward")))
+                if flag is not None]
+    if recorded:
+        valid = recorded[0][1]
     override = _flag(info.get("policy_override"), "has_valid_reward")
     if override is not None:
-        kind = "agent" if override else "unknown" if kind == "agent" else kind
-        valid = override
-        text += f" (policy_override has_valid_reward={str(override).lower()})"
-    for recorded in (_flag(info.get("policy"), "has_valid_reward"), _flag(data, "reward_valid")):
-        if recorded is not None:
-            valid = recorded   # later wins: reward_valid, then the recorded policy, then the table
+        note = f"policy_override has_valid_reward={str(override).lower()}"
+        if recorded and recorded[0][1] != override:
+            note += f", overruled by {recorded[0][0]}"
+        else:
+            kind = "agent" if override else "unknown" if kind == "agent" else kind
+            valid = override
+        text += f" ({note})"
     return text, kind, valid
 
 
@@ -191,26 +203,31 @@ def load(path: Path) -> tuple[list[Record], list[str]]:
         try:
             record = _record(data, file.parent)
         except ValueError as exc:
-            raise ValueError(f"{name}: {exc}") from exc
+            warnings.append(f"{name}: trial skipped ({exc}).")
+            continue
         if record is None:
             warnings.append(f"{name}: trial of the nop agent skipped; it is not a system under test.")
         else:
             records.append(record)
     if not records:
-        raise ValueError("no readable Harbor trial result found")
+        raise ValueError("no readable Harbor trial result found" + (": " + " ".join(warnings) if warnings else ""))
     return records, warnings
 
 
-def merge(records: list[Record]) -> tuple[list[Record], list[str]]:
-    """Drop a trial that was read again under another job directory; warn on mixed task checksums."""
+def merge(loaded: list[tuple[Path, list[Record]]]) -> tuple[list[Record], list[str]]:
+    """Keep the first copy of a trial that was supplied more than once; warn on mixed task checksums.
+
+    A trial is its task, system and run_id, whatever the job directory is called.
+    """
     kept, warnings = [], []
-    jobs: dict[tuple, str | None] = {}
+    first: dict[tuple, Record] = {}
     versions: dict[str, set] = {}
-    for record in records:
-        first = jobs.setdefault(record.attempt_key, record.job_id)
-        if first != record.job_id:
-            warnings.append(f"Harbor trial {record.run_id} of task {record.task_id} appears under jobs "
-                            f"{first} and {record.job_id}; the first copy is kept.")
+    for record in (record for _, records in loaded for record in records):
+        earlier = first.setdefault(record.attempt_key, record)
+        if earlier is not record:
+            differ = "" if replace(record, job_id=earlier.job_id) == earlier else "; the copies differ"
+            warnings.append(f"Harbor trial {record.run_id} of task {record.task_id} was supplied more than once; "
+                            f"the first copy is kept{differ}.")
             continue
         kept.append(record)
         if record.task_version:

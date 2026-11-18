@@ -8,8 +8,11 @@ from .formats.inspect_json import inspect_records  # noqa: F401  (kept importabl
 from .model import Record
 
 
+V1_FORMATS = ("generic", "inspect")
+
+
 def _merged(loaded: list[tuple[str, str, list[Record]]]) -> tuple[list[tuple[str, list[Record]]], list[str]]:
-    """Apply each format's merge once over all its inputs.
+    """Apply each format's merge once over all its inputs, given as (input path, records) pairs.
 
     A merged format's records all sit at its first input; other inputs keep their place.
     """
@@ -20,7 +23,7 @@ def _merged(loaded: list[tuple[str, str, list[Record]]]) -> tuple[list[tuple[str
             result.append((path, records))
         elif name not in done:
             done.add(name)
-            merged, notes = merge([r for _, other, group in loaded if other == name for r in group])
+            merged, notes = merge([(Path(source), group) for source, other, group in loaded if other == name])
             result.append((path, merged))
             warnings.extend(notes)
     return result, warnings
@@ -34,6 +37,7 @@ def load_inputs(paths: Iterable[str], fmt: str = "auto") -> tuple[list[Record], 
     kinds = {}
     loaded = []
     for path in paths:
+        name = fmt
         try:
             name = detect_format(Path(path)) if fmt == "auto" else fmt
             found, notes = load_path(Path(path), name)
@@ -41,7 +45,12 @@ def load_inputs(paths: Iterable[str], fmt: str = "auto") -> tuple[list[Record], 
             loaded.append((path, name, found))
         except UnicodeDecodeError:
             raise  # As before the format split: a file that is not UTF-8 reports the codec error alone.
-        except (ValueError, TypeError, AttributeError, KeyError) as exc:
+        except ValueError as exc:
+            raise ValueError(f"{path}: {exc}") from exc
+        except (TypeError, AttributeError, KeyError) as exc:
+            # 0.1.0 reported these as input errors for its two formats. In a newer reader they are bugs.
+            if name not in V1_FORMATS:
+                raise
             raise ValueError(f"{path}: {exc}") from exc
     groups, notes = _merged(loaded)
     warnings.extend(notes)
