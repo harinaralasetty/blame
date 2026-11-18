@@ -98,7 +98,7 @@ class ReportV2Tests(unittest.TestCase):
         self.assertEqual((task["task_id"], task["systems_attempted"], task["systems_failed"], task["reference"]),
                          ("t1", 1, 1, "passed 1 of 2 attempts"))
         self.assertTrue(task["next_step"])
-        self.assertEqual(sum(task["labels"].values()), 2)
+        self.assertEqual(task["labels"], {"infra": 1, "reference_flaky": 2, "attempts_flip": 1})
 
     def test_task_table_without_reference_and_with_ungraded_reference(self):
         self.assertEqual(build_report([bare()])["by_task"][0]["reference"], "no reference run supplied")

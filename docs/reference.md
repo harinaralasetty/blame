@@ -14,7 +14,7 @@ See the [README](../README.md) for setup, public findings and limits.
 
 The executable is named `blame`; use `./blame` from this checkout or put this directory on PATH. `python3 -m blame_cli` is equivalent. Inputs may mix generic JSONL and Inspect text JSON. Errors return status 2 with the input path and, for JSONL, the line number. Files are read before any reports are written. Exact duplicate records are ignored with a warning.
 
-`label` produces one row per lost or ungraded observation with a stable record ID, instruction, rubric, output, score, judge reasoning, predicted label, all detector matches, confidence, evidence, and an empty `human_label`. Fill only `human_label` with one of the five class names, then run `score`. Keep predictions and detector matches unchanged.
+`label` produces one row per lost or ungraded observation with a stable record ID, instruction, rubric, output, score, judge reasoning, predicted label, all detector matches, confidence, evidence, and an empty `human_label`. Fill only `human_label` with one of the eleven labels listed under [Labels](#labels), then run `score`. Label files written by 0.1.0 still score. Keep predictions and detector matches unchanged.
 
 CSV display cells beginning with `=`, `+`, `-`, or `@` (including after whitespace), or a tab, carriage return or newline, receive a leading apostrophe to keep them as spreadsheet text. The separate `original_record_json` column retains the exact record as JSON, including the original output; record IDs do not change. Leave the apostrophes in place when labeling. This protects the generated export; spreadsheet software can alter escaping when saving it again.
 
@@ -89,7 +89,7 @@ The metadata keys above are application conventions in Inspect's free-form metad
 
 Markdown and HTML show the same data. They print `confidence` as "rule strength", and a text field the format does not carry as "not available in this format". In HTML the per-task rows are a list under "Failed tasks".
 
-## Detectors and confidence
+## Detector details
 
 All detectors are pure. `blame_cli/detectors.py:INFRA_RULES` is the single table of infrastructure rules and strengths. Rules check a nonempty error field, whitespace-only output, or a whole output shaped like a timeout, rate limit/429, HTTP 5xx/gateway, or missing-artifact error. Bare numbers such as `429` and `500` do not match. Text rules accept fixed failure phrases such as `request timed out`, `rate limit exceeded`, `HTTP 503`, and `500 Internal Server Error`, with optional terminal punctuation. Only timeout `: upstream` and missing-artifact `: filename` details are accepted. Explanatory trailing prose does not match. This trades recall for fewer false positives; an answer consisting only of an error phrase is still ambiguous.
 
@@ -101,5 +101,29 @@ The heuristic reasoner checks explicit requirement wording (`must`, `require`, `
 
 `Reasoner.missing_requirements(instruction, rubric)` is the small extension interface. Inject a replacement using `triage(records, reasoner=...)` or `build_report(..., reasoner=...)`. A future LLM implementation belongs behind that interface. The shipped implementation is deterministic; no LLM calls exist.
 
-Precedence is infra, judge instability, everyone loses, unstated requirement, then genuine failure. JSON and HTML retain all detector matches. Confidence values are fixed evidence strengths, not calibrated probabilities: 0.94-0.99 for infra depending on the rule, 0.99 for observed judge disagreement, 0.90 for cohort zeros, 0.65 for missing literal anchors, and 0.50 for the default. Genuine failure means no detector fired; it is not proof that the model failed.
+## Labels
+
+Only failed candidate records are triaged: a score below 1, or no score. Each detector returns at most one match and every match is kept in `matches`; the verdict is the first match in the order below, which is `blame_cli/model.py:LABELS`, the only precedence table. Strengths are fixed rule strengths, not calibrated probabilities.
+
+| Label | Category | Fires when | Strength |
+| --- | --- | --- | --- |
+| `infra` | infra | `error_kind` is unset and the record has a nonempty error or an `INFRA_RULES` output match; or `error_kind` is `infra` | 0.94-0.99 by rule; 0.80 for `error_kind` |
+| `setup_error` | setup | `error_kind` is `setup` | 0.85 |
+| `grader_error` | grader | `error_kind` is `grader` | 0.85 |
+| `judge_unstable` | grader | two or more `judge_run` gradings of the same output disagree | 0.99 |
+| `reference_flaky` | grader | reference attempts on this task and check include a pass and a scored failure | 0.85 |
+| `reference_fails` | task | one or more scored reference failures and no reference pass | 0.90 with two or more failures; 0.75 with one; at most 0.60 when a task version is unset |
+| `item_everyone_loses` | task | two or more systems, every scored attempt at zero | 0.90 for records without optional keys; otherwise 0.50 for 2 systems, 0.70 for 3 or 4, 0.90 for 5 or more |
+| `unstated_requirement` | instruction | the rubric requires a literal term the instruction never mentions | 0.65 |
+| `attempts_flip` | unexplained | another attempt (a different `run_id`) of the same system on the same task and check scored 1 | 0.40 |
+| `unclassified_error` | unexplained | `error_kind` is `unknown` | 0.40 |
+| `genuine_failure` | unexplained | no detector matched | 0.50 |
+
+`genuine_failure` means no detector fired; it is not proof that the model failed. An `agent` error gets no label of its own: the harness counts that attempt as a valid failure, and its error text is shown in the evidence of whichever verdict it gets.
+
+Attempts with `error_kind` `infra`, `setup` or `grader` are left out of every comparison between attempts (the reference rules, `item_everyone_loses`, `attempts_flip`); they count as no evidence, never as failures. The reference rules and `attempts_flip` also leave out an attempt the 0.1.0 infra rules match; `item_everyone_loses` keeps it, as 0.1.0 did. Attempts with no score never count as a pass or a fail. `unknown` and `agent` attempts stay in.
+
+Reference rules compare only reference attempts whose `task_version` does not differ from the record's; when either version is unset the evidence says "task version not available". `item_everyone_loses` abstains when its cohort has more than one `task_version`. A reference label describes the task, so it becomes the verdict of every failed candidate attempt on that task, including real failures.
+
+Every `next_step` in `by_task` is an instruction to check something. The labels state what the result files record; they do not establish that a task, a test or a model is at fault.
 

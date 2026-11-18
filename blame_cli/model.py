@@ -17,9 +17,15 @@ class LabelInfo:
 # The last label is the default when no detector fires.
 LABELS = (
     LabelInfo("infra", "infra", "Rerun the attempt after checking the recorded error or output."),
+    LabelInfo("setup_error", "setup", "Fix the run configuration named in the error, then rerun the attempt."),
+    LabelInfo("grader_error", "grader", "Read the verifier error and rerun grading before counting this attempt."),
     LabelInfo("judge_unstable", "grader", "Compare the gradings of this output before trusting either score."),
+    LabelInfo("reference_flaky", "grader", "Rerun the reference solution several times before scoring systems on this task."),
+    LabelInfo("reference_fails", "task", "Rerun the reference before scoring systems on this task."),
     LabelInfo("item_everyone_loses", "task", "Check the task and its checks against a known-good solution."),
     LabelInfo("unstated_requirement", "instruction", "Check whether the instruction states what the rubric requires."),
+    LabelInfo("attempts_flip", "unexplained", "Compare a passing and a failing attempt of this system; the results do not say why they differ."),
+    LabelInfo("unclassified_error", "unexplained", "Read the recorded error; the format does not classify it."),
     LabelInfo("genuine_failure", "unexplained", "Read the output and the grader note; no rule explains this loss."),
 )
 CLASSES = tuple(label.name for label in LABELS)

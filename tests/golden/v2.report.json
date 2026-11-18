@@ -1,0 +1,1192 @@
+{
+  "schema_version": 2,
+  "scored_items": 17,
+  "lost_items": 12,
+  "lost_points": 11.5,
+  "ungraded_items": 4,
+  "reference_items": 4,
+  "counting": "Each scored observation below 1 is a lost item, including repeated judges. 4 attempts were never graded and are listed as ungraded.",
+  "confidence_note": "Confidence values are fixed heuristic strengths, not calibrated probabilities.",
+  "warnings": [],
+  "by_class": [
+    {
+      "class": "infra",
+      "category": "infra",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "setup_error",
+      "category": "setup",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "grader_error",
+      "category": "grader",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "judge_unstable",
+      "category": "grader",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "reference_flaky",
+      "category": "grader",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "reference_fails",
+      "category": "task",
+      "lost_items": 2,
+      "lost_points": 2.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "item_everyone_loses",
+      "category": "task",
+      "lost_items": 3,
+      "lost_points": 3.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "unstated_requirement",
+      "category": "instruction",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "attempts_flip",
+      "category": "unexplained",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "unclassified_error",
+      "category": "unexplained",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "genuine_failure",
+      "category": "unexplained",
+      "lost_items": 2,
+      "lost_points": 1.5,
+      "ungraded_items": 0
+    }
+  ],
+  "by_model": [
+    {
+      "model": "model-m",
+      "scored_items": 1,
+      "lost_items": 1,
+      "lost_points": 0.5,
+      "ungraded_items": 0,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 1
+    },
+    {
+      "model": "model-n",
+      "scored_items": 1,
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    },
+    {
+      "model": "scaffold-a / model-m",
+      "scored_items": 8,
+      "lost_items": 6,
+      "lost_points": 6.0,
+      "ungraded_items": 1,
+      "infra": 1,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 1,
+      "reference_flaky": 1,
+      "reference_fails": 1,
+      "item_everyone_loses": 1,
+      "unstated_requirement": 1,
+      "attempts_flip": 1,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    },
+    {
+      "model": "scaffold-b / model-m",
+      "scored_items": 3,
+      "lost_items": 2,
+      "lost_points": 2.0,
+      "ungraded_items": 1,
+      "infra": 0,
+      "setup_error": 1,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 1,
+      "item_everyone_loses": 1,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    },
+    {
+      "model": "scaffold-c / model-m",
+      "scored_items": 1,
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 1,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 1,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 1,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    },
+    {
+      "model": "scaffold-d / model-m",
+      "scored_items": 1,
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0,
+      "infra": 1,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    },
+    {
+      "model": "scaffold-e / model-m",
+      "scored_items": 0,
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 1,
+      "genuine_failure": 0
+    },
+    {
+      "model": "scaffold-f / model-m",
+      "scored_items": 1,
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 1
+    },
+    {
+      "model": "scaffold-g / model-m",
+      "scored_items": 1,
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 0,
+      "reference_fails": 0,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    }
+  ],
+  "by_task": [
+    {
+      "task_id": "errors",
+      "systems_attempted": 7,
+      "systems_failed": 2,
+      "reference": "no reference run supplied",
+      "labels": {
+        "infra": 2,
+        "setup_error": 1,
+        "grader_error": 1,
+        "unclassified_error": 1,
+        "genuine_failure": 1
+      },
+      "primary_label": "infra",
+      "category": "infra",
+      "max_confidence": 0.99,
+      "next_step": "Rerun the attempt after checking the recorded error or output."
+    },
+    {
+      "task_id": "regraded",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "judge_unstable": 1
+      },
+      "primary_label": "judge_unstable",
+      "category": "grader",
+      "max_confidence": 0.99,
+      "next_step": "Compare the gradings of this output before trusting either score."
+    },
+    {
+      "task_id": "reference-flaky",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "passed 1 of 2 attempts",
+      "labels": {
+        "reference_flaky": 1
+      },
+      "primary_label": "reference_flaky",
+      "category": "grader",
+      "max_confidence": 0.85,
+      "next_step": "Rerun the reference solution several times before scoring systems on this task."
+    },
+    {
+      "task_id": "reference-fails",
+      "systems_attempted": 2,
+      "systems_failed": 2,
+      "reference": "passed 0 of 2 attempts",
+      "labels": {
+        "reference_fails": 2,
+        "item_everyone_loses": 2
+      },
+      "primary_label": "reference_fails",
+      "category": "task",
+      "max_confidence": 0.9,
+      "next_step": "Rerun the reference before scoring systems on this task."
+    },
+    {
+      "task_id": "all-zero",
+      "systems_attempted": 3,
+      "systems_failed": 3,
+      "reference": "no reference run supplied",
+      "labels": {
+        "item_everyone_loses": 3
+      },
+      "primary_label": "item_everyone_loses",
+      "category": "task",
+      "max_confidence": 0.7,
+      "next_step": "Check the task and its checks against a known-good solution."
+    },
+    {
+      "task_id": "unstated",
+      "systems_attempted": 2,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "unstated_requirement": 1
+      },
+      "primary_label": "unstated_requirement",
+      "category": "instruction",
+      "max_confidence": 0.65,
+      "next_step": "Check whether the instruction states what the rubric requires."
+    },
+    {
+      "task_id": "flip",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "attempts_flip": 1
+      },
+      "primary_label": "attempts_flip",
+      "category": "unexplained",
+      "max_confidence": 0.4,
+      "next_step": "Compare a passing and a failing attempt of this system; the results do not say why they differ."
+    },
+    {
+      "task_id": "plain",
+      "systems_attempted": 2,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "genuine_failure": 1
+      },
+      "primary_label": "genuine_failure",
+      "category": "unexplained",
+      "max_confidence": 0.5,
+      "next_step": "Read the output and the grader note; no rule explains this loss."
+    }
+  ],
+  "items": [
+    {
+      "record_id": "e7c2c44c179c320166049bc244d1e50309b06c5d8f9136720122709613931308",
+      "record": {
+        "task_id": "errors",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "",
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Sandbox did not start within 300 seconds.",
+        "agent": "scaffold-a",
+        "error_kind": "infra",
+        "job_id": "job-1"
+      },
+      "label": "infra",
+      "confidence": 0.8,
+      "evidence": {
+        "observed": "The harness classified this attempt's error as an infrastructure fault.",
+        "rule": "error_kind",
+        "quote": "Sandbox did not start within 300 seconds."
+      },
+      "matches": [
+        {
+          "label": "infra",
+          "confidence": 0.8,
+          "evidence": {
+            "observed": "The harness classified this attempt's error as an infrastructure fault.",
+            "rule": "error_kind",
+            "quote": "Sandbox did not start within 300 seconds."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "d5e6ee9e807494786ab91c2f6ce174df40a522d44ff58360d0aab1f76b81831b",
+      "record": {
+        "task_id": "errors",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "",
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Model name is not known to the provider.",
+        "agent": "scaffold-b",
+        "error_kind": "setup",
+        "job_id": "job-1"
+      },
+      "label": "setup_error",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The harness recorded a setup or configuration error for this attempt.",
+        "error": "Model name is not known to the provider."
+      },
+      "matches": [
+        {
+          "label": "setup_error",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The harness recorded a setup or configuration error for this attempt.",
+            "error": "Model name is not known to the provider."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "ea49b68d5ed7599f39cd47f4966f2ec05dfb29d487a7746d841719f1229b680e",
+      "record": {
+        "task_id": "errors",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "",
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Verifier timed out before writing a result.",
+        "agent": "scaffold-c",
+        "error_kind": "grader",
+        "job_id": "job-1"
+      },
+      "label": "grader_error",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The harness recorded that the verifier did not produce a result for this attempt.",
+        "error": "Verifier timed out before writing a result."
+      },
+      "matches": [
+        {
+          "label": "grader_error",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The harness recorded that the verifier did not produce a result for this attempt.",
+            "error": "Verifier timed out before writing a result."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "9974873462041120cb2d911c4e0555211ecab0527defc5818914434c06686fc3",
+      "record": {
+        "task_id": "errors",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "No answer was produced.",
+        "judge_run": null,
+        "error": "connection reset by peer",
+        "agent": "scaffold-d"
+      },
+      "label": "infra",
+      "confidence": 0.99,
+      "evidence": {
+        "rule": "error_field",
+        "quote": "connection reset by peer"
+      },
+      "matches": [
+        {
+          "label": "infra",
+          "confidence": 0.99,
+          "evidence": {
+            "rule": "error_field",
+            "quote": "connection reset by peer"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "b6dabeaf98a2d21e33b6e002fccf57cd7e6e73fd7ab6f5d15d8951f55b5b719c",
+      "record": {
+        "task_id": "errors",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "",
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "RegradeError: grading was repeated and did not finish.",
+        "agent": "scaffold-e",
+        "error_kind": "unknown",
+        "job_id": "job-1"
+      },
+      "label": "unclassified_error",
+      "confidence": 0.4,
+      "evidence": {
+        "observed": "The harness recorded an error that the format does not classify.",
+        "error": "RegradeError: grading was repeated and did not finish."
+      },
+      "matches": [
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "RegradeError: grading was repeated and did not finish."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "36b8d082d5ab8d54738670f832c78ac20e555e2cffaa00f72f66fe8ac4782552",
+      "record": {
+        "task_id": "errors",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "2 of 5 tests failed.",
+        "judge_run": null,
+        "error": "Agent stopped at its time limit.",
+        "agent": "scaffold-f",
+        "error_kind": "agent",
+        "job_id": "job-1"
+      },
+      "label": "genuine_failure",
+      "confidence": 0.5,
+      "evidence": {
+        "score": 0.0,
+        "rubric_quote": "The hidden test suite passes.",
+        "output_quote": "patch applied",
+        "judge_reasoning_quote": "2 of 5 tests failed.",
+        "note": "No precision-first detector fired. Default, not a proven model failure.",
+        "error": "Agent stopped at its time limit."
+      },
+      "matches": []
+    },
+    {
+      "record_id": "51dda54ba8152b6368ca6eb7d488718455ed785a6f700854d251544029ea132d",
+      "record": {
+        "task_id": "regraded",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_parse failed.",
+        "judge_run": 1,
+        "error": null,
+        "agent": "scaffold-a"
+      },
+      "label": "judge_unstable",
+      "confidence": 0.99,
+      "evidence": {
+        "output_quote": "patch applied",
+        "judge_scores": [
+          {
+            "judge_run": 1,
+            "score": 0.0
+          },
+          {
+            "judge_run": 2,
+            "score": 1.0
+          }
+        ],
+        "different_score_pairs": 1,
+        "judge_pairs": 1,
+        "flip_rate": 1.0
+      },
+      "matches": [
+        {
+          "label": "judge_unstable",
+          "confidence": 0.99,
+          "evidence": {
+            "output_quote": "patch applied",
+            "judge_scores": [
+              {
+                "judge_run": 1,
+                "score": 0.0
+              },
+              {
+                "judge_run": 2,
+                "score": 1.0
+              }
+            ],
+            "different_score_pairs": 1,
+            "judge_pairs": 1,
+            "flip_rate": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "fc06a8aea3eb049b5fa4698733fb41b2df21b1c9192a3a52d91ddf579cf7294e",
+      "record": {
+        "task_id": "reference-flaky",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_clock failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-a",
+        "task_version": "sha-1"
+      },
+      "label": "reference_flaky",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The reference solution passed 1 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle / reference",
+            "run_id": "ref-1",
+            "score": 1.0
+          },
+          {
+            "system": "oracle / reference",
+            "run_id": "ref-2",
+            "score": 0.0
+          }
+        ]
+      },
+      "matches": [
+        {
+          "label": "reference_flaky",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The reference solution passed 1 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle / reference",
+                "run_id": "ref-1",
+                "score": 1.0
+              },
+              {
+                "system": "oracle / reference",
+                "run_id": "ref-2",
+                "score": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "eb9743f3cbe90973f9c2c7a53b7dfc9df7657adfa9a91ca1b92b184bb55958a4",
+      "record": {
+        "task_id": "reference-fails",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_io failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-a",
+        "task_version": "sha-2"
+      },
+      "label": "reference_fails",
+      "confidence": 0.9,
+      "evidence": {
+        "observed": "The reference solution did not pass in 2 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle / reference",
+            "run_id": "ref-1",
+            "score": 0.0
+          },
+          {
+            "system": "oracle / reference",
+            "run_id": "ref-2",
+            "score": 0.0
+          }
+        ],
+        "task_version": "same as this attempt"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.9,
+          "evidence": {
+            "observed": "The reference solution did not pass in 2 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle / reference",
+                "run_id": "ref-1",
+                "score": 0.0
+              },
+              {
+                "system": "oracle / reference",
+                "run_id": "ref-2",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        },
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.5,
+          "evidence": {
+            "observed": "No supplied system scored above zero (2 systems).",
+            "rubric_quote": "The hidden test suite passes.",
+            "models": [
+              "scaffold-a / model-m",
+              "scaffold-b / model-m"
+            ],
+            "model_count": 2,
+            "observation_count": 2,
+            "run_count": 2,
+            "zero_count": 2,
+            "scores_by_model": {
+              "scaffold-a / model-m": [
+                0.0
+              ],
+              "scaffold-b / model-m": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "f212fe3d560a171bf743f95ac540356dd4779dc14487fd373a8ecc0c3c76c97b",
+      "record": {
+        "task_id": "reference-fails",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_io failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-b",
+        "task_version": "sha-2"
+      },
+      "label": "reference_fails",
+      "confidence": 0.9,
+      "evidence": {
+        "observed": "The reference solution did not pass in 2 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle / reference",
+            "run_id": "ref-1",
+            "score": 0.0
+          },
+          {
+            "system": "oracle / reference",
+            "run_id": "ref-2",
+            "score": 0.0
+          }
+        ],
+        "task_version": "same as this attempt"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.9,
+          "evidence": {
+            "observed": "The reference solution did not pass in 2 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle / reference",
+                "run_id": "ref-1",
+                "score": 0.0
+              },
+              {
+                "system": "oracle / reference",
+                "run_id": "ref-2",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        },
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.5,
+          "evidence": {
+            "observed": "No supplied system scored above zero (2 systems).",
+            "rubric_quote": "The hidden test suite passes.",
+            "models": [
+              "scaffold-a / model-m",
+              "scaffold-b / model-m"
+            ],
+            "model_count": 2,
+            "observation_count": 2,
+            "run_count": 2,
+            "zero_count": 2,
+            "scores_by_model": {
+              "scaffold-a / model-m": [
+                0.0
+              ],
+              "scaffold-b / model-m": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "4ad1bb40579b77375d593ec55894aaff618671f853ce74e0060883c3c67e3d17",
+      "record": {
+        "task_id": "all-zero",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_edge failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-a"
+      },
+      "label": "item_everyone_loses",
+      "confidence": 0.7,
+      "evidence": {
+        "observed": "No supplied system scored above zero (3 systems).",
+        "rubric_quote": "The hidden test suite passes.",
+        "models": [
+          "scaffold-a / model-m",
+          "scaffold-b / model-m",
+          "scaffold-c / model-m"
+        ],
+        "model_count": 3,
+        "observation_count": 3,
+        "run_count": 3,
+        "zero_count": 3,
+        "scores_by_model": {
+          "scaffold-a / model-m": [
+            0.0
+          ],
+          "scaffold-b / model-m": [
+            0.0
+          ],
+          "scaffold-c / model-m": [
+            0.0
+          ]
+        },
+        "scope": "All supplied observations only; this does not prove a bad item."
+      },
+      "matches": [
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.7,
+          "evidence": {
+            "observed": "No supplied system scored above zero (3 systems).",
+            "rubric_quote": "The hidden test suite passes.",
+            "models": [
+              "scaffold-a / model-m",
+              "scaffold-b / model-m",
+              "scaffold-c / model-m"
+            ],
+            "model_count": 3,
+            "observation_count": 3,
+            "run_count": 3,
+            "zero_count": 3,
+            "scores_by_model": {
+              "scaffold-a / model-m": [
+                0.0
+              ],
+              "scaffold-b / model-m": [
+                0.0
+              ],
+              "scaffold-c / model-m": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "1f55015c2b0a652b8162d0820fee243fa11c12fe4796eb1e82f5d745c5fff273",
+      "record": {
+        "task_id": "all-zero",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_edge failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-b"
+      },
+      "label": "item_everyone_loses",
+      "confidence": 0.7,
+      "evidence": {
+        "observed": "No supplied system scored above zero (3 systems).",
+        "rubric_quote": "The hidden test suite passes.",
+        "models": [
+          "scaffold-a / model-m",
+          "scaffold-b / model-m",
+          "scaffold-c / model-m"
+        ],
+        "model_count": 3,
+        "observation_count": 3,
+        "run_count": 3,
+        "zero_count": 3,
+        "scores_by_model": {
+          "scaffold-a / model-m": [
+            0.0
+          ],
+          "scaffold-b / model-m": [
+            0.0
+          ],
+          "scaffold-c / model-m": [
+            0.0
+          ]
+        },
+        "scope": "All supplied observations only; this does not prove a bad item."
+      },
+      "matches": [
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.7,
+          "evidence": {
+            "observed": "No supplied system scored above zero (3 systems).",
+            "rubric_quote": "The hidden test suite passes.",
+            "models": [
+              "scaffold-a / model-m",
+              "scaffold-b / model-m",
+              "scaffold-c / model-m"
+            ],
+            "model_count": 3,
+            "observation_count": 3,
+            "run_count": 3,
+            "zero_count": 3,
+            "scores_by_model": {
+              "scaffold-a / model-m": [
+                0.0
+              ],
+              "scaffold-b / model-m": [
+                0.0
+              ],
+              "scaffold-c / model-m": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "9d5395570aa74e6182b6ecda0dd131ac8479f3589debda572ec4ad6fd532f3af",
+      "record": {
+        "task_id": "all-zero",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_edge failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-c"
+      },
+      "label": "item_everyone_loses",
+      "confidence": 0.7,
+      "evidence": {
+        "observed": "No supplied system scored above zero (3 systems).",
+        "rubric_quote": "The hidden test suite passes.",
+        "models": [
+          "scaffold-a / model-m",
+          "scaffold-b / model-m",
+          "scaffold-c / model-m"
+        ],
+        "model_count": 3,
+        "observation_count": 3,
+        "run_count": 3,
+        "zero_count": 3,
+        "scores_by_model": {
+          "scaffold-a / model-m": [
+            0.0
+          ],
+          "scaffold-b / model-m": [
+            0.0
+          ],
+          "scaffold-c / model-m": [
+            0.0
+          ]
+        },
+        "scope": "All supplied observations only; this does not prove a bad item."
+      },
+      "matches": [
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.7,
+          "evidence": {
+            "observed": "No supplied system scored above zero (3 systems).",
+            "rubric_quote": "The hidden test suite passes.",
+            "models": [
+              "scaffold-a / model-m",
+              "scaffold-b / model-m",
+              "scaffold-c / model-m"
+            ],
+            "model_count": 3,
+            "observation_count": 3,
+            "run_count": 3,
+            "zero_count": 3,
+            "scores_by_model": {
+              "scaffold-a / model-m": [
+                0.0
+              ],
+              "scaffold-b / model-m": [
+                0.0
+              ],
+              "scaffold-c / model-m": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "a3aa74285c05a2015e9ebc0748366fe59df265fa7dcad5fb1415b01aff1c0ce3",
+      "record": {
+        "task_id": "unstated",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Write a short sign-off for the email.",
+        "rubric_item_id": "signoff",
+        "rubric_item_text": "Must include \"Kind regards\".",
+        "output": "Thanks, Sam",
+        "score": 0.0,
+        "judge_reasoning": "Sign-off phrase is missing.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-a"
+      },
+      "label": "unstated_requirement",
+      "confidence": 0.65,
+      "evidence": {
+        "missing_terms": [
+          "Kind regards"
+        ],
+        "closest_instruction_sentence": "Write a short sign-off for the email.",
+        "rubric_quote": "Must include \"Kind regards\".",
+        "method": "literal anchors; absence is not proof of unfairness"
+      },
+      "matches": [
+        {
+          "label": "unstated_requirement",
+          "confidence": 0.65,
+          "evidence": {
+            "missing_terms": [
+              "Kind regards"
+            ],
+            "closest_instruction_sentence": "Write a short sign-off for the email.",
+            "rubric_quote": "Must include \"Kind regards\".",
+            "method": "literal anchors; absence is not proof of unfairness"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "ef010adcf8e26d75ee00da425657d8e1d4732044452317c8a2654b2711ca9d05",
+      "record": {
+        "task_id": "flip",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.0,
+        "judge_reasoning": "test_sort failed.",
+        "judge_run": null,
+        "error": null,
+        "agent": "scaffold-a"
+      },
+      "label": "attempts_flip",
+      "confidence": 0.4,
+      "evidence": {
+        "observed": "This system passed 1 of 2 attempts.",
+        "passes": 1,
+        "attempts": 2,
+        "passed_run_ids": [
+          "run-2"
+        ],
+        "other_run_ids": [
+          "run-1"
+        ],
+        "scope": "The results do not say whether the system, the task or the grader differs between attempts."
+      },
+      "matches": [
+        {
+          "label": "attempts_flip",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "This system passed 1 of 2 attempts.",
+            "passes": 1,
+            "attempts": 2,
+            "passed_run_ids": [
+              "run-2"
+            ],
+            "other_run_ids": [
+              "run-1"
+            ],
+            "scope": "The results do not say whether the system, the task or the grader differs between attempts."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "bf90f3d8942de6b5796024bc61f3c02ef4abe6b96c55bd08e066312bacbe5a38",
+      "record": {
+        "task_id": "plain",
+        "model": "model-m",
+        "run_id": "run-1",
+        "instruction": "Make the test suite pass.",
+        "rubric_item_id": "tests",
+        "rubric_item_text": "The hidden test suite passes.",
+        "output": "patch applied",
+        "score": 0.5,
+        "judge_reasoning": "3 of 6 tests failed.",
+        "judge_run": null,
+        "error": null
+      },
+      "label": "genuine_failure",
+      "confidence": 0.5,
+      "evidence": {
+        "score": 0.5,
+        "rubric_quote": "The hidden test suite passes.",
+        "output_quote": "patch applied",
+        "judge_reasoning_quote": "3 of 6 tests failed.",
+        "note": "No precision-first detector fired. Default, not a proven model failure."
+      },
+      "matches": []
+    }
+  ]
+}

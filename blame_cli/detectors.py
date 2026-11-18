@@ -1,9 +1,9 @@
 """Pure, precision-first detectors. None perform I/O or call an LLM."""
 
 from collections import Counter, defaultdict
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 import re
-from typing import Protocol, Sequence
+from typing import Callable, Protocol, Sequence
 
 from .model import CLASSES, Finding, Record, record_dict
 
@@ -20,9 +20,21 @@ INFRA_RULES = (
 )
 
 
+# Attempts the harness says ended for one of these reasons are no evidence about the
+# task or the system, so cross-attempt detectors leave them out.
+EXCLUDED_KINDS = ("infra", "setup", "grader")
+
+
 def infra(record: Record) -> Finding | None:
     if record.score == 1:
         return None
+    if record.error_kind is not None:
+        # The harness classified the error; its class replaces the v1 text rules.
+        if record.error_kind != "infra":
+            return None
+        return Finding("infra", 0.80, {
+            "observed": "The harness classified this attempt's error as an infrastructure fault.",
+            "rule": "error_kind", "quote": record.error})
     for name, pattern, confidence in INFRA_RULES:
         if name == "error_field":
             matched = bool(record.error and record.error.strip())
@@ -73,22 +85,37 @@ def judge_unstable(record: Record, peers: Sequence[Record]) -> Finding | None:
     return _judge_finding(record, _judge_disagreement([p for p in peers if p.judge_key == key]))
 
 
+def _v1_shaped(record: Record) -> bool:
+    return (record.agent is None and record.error_kind is None and record.task_version is None
+            and record.job_id is None)
+
+
 def item_everyone_loses(record: Record, peers: Sequence[Record]) -> Finding | None:
-    group = [p for p in peers if p.item_key == record.item_key]
-    models = sorted({p.model for p in group})
-    if record.score != 0 or len(models) < 2 or any(p.score != 0 for p in group):
+    group = [p for p in peers if p.item_key == record.item_key and p.role == "candidate"
+             and p.score is not None and p.error_kind not in EXCLUDED_KINDS]
+    models = sorted({p.system for p in group})
+    if (record.score != 0 or record.error_kind in EXCLUDED_KINDS or len(models) < 2
+            or any(p.score != 0 for p in group)):
         return None
     if any((p.instruction, p.rubric_item_text) !=
            (record.instruction, record.rubric_item_text) for p in group):
         return None
-    return Finding("item_everyone_loses", 0.90, {
+    if len({p.task_version for p in group}) > 1:
+        return None
+    evidence = {
         "rubric_quote": record.rubric_item_text,
         "models": models, "model_count": len(models), "observation_count": len(group),
-        "run_count": len({(p.model, p.run_id) for p in group}),
+        "run_count": len({(p.system, p.run_id) for p in group}),
         "zero_count": len(group),
-        "scores_by_model": {m: [p.score for p in group if p.model == m] for m in models},
+        "scores_by_model": {m: [p.score for p in group if p.system == m] for m in models},
         "scope": "All supplied observations only; this does not prove a bad item.",
-    })
+    }
+    if all(_v1_shaped(p) for p in group):
+        return Finding("item_everyone_loses", 0.90, evidence)
+    # With agents, versions or harness errors in play, a small cohort says less.
+    strength = 0.50 if len(models) == 2 else 0.70 if len(models) <= 4 else 0.90
+    return Finding("item_everyone_loses", strength, {
+        "observed": f"No supplied system scored above zero ({len(models)} systems).", **evidence})
 
 
 class Reasoner(Protocol):
@@ -154,29 +181,145 @@ def unstated_requirement(record: Record, reasoner: Reasoner) -> Finding | None:
     return Finding("unstated_requirement", 0.65, evidence) if evidence else None
 
 
-def triage(records: Sequence[Record], reasoner: Reasoner | None = None) -> list[dict]:
-    reasoner = reasoner if reasoner is not None else HeuristicReasoner()
-    by_item: dict[tuple, list[Record]] = defaultdict(list)
+def _usable(record: Record) -> bool:
+    """Whether a result counts in comparisons across attempts."""
+    return record.score is not None and record.error_kind not in EXCLUDED_KINDS and infra(record) is None
+
+
+@dataclass(frozen=True)
+class Index:
+    """Record groups, built once for a triage run."""
+
+    items: dict       # item_key -> every candidate record
+    attempts: dict    # item_key -> usable candidate records
+    references: dict  # item_key -> usable reference records
+    judges: dict      # judge_key -> disagreement summary or None
+
+
+def build_index(records: Sequence[Record]) -> Index:
+    items: dict[tuple, list[Record]] = defaultdict(list)
+    attempts: dict[tuple, list[Record]] = defaultdict(list)
+    references: dict[tuple, list[Record]] = defaultdict(list)
     by_judge: dict[tuple, list[Record]] = defaultdict(list)
-    records = [record for record in records if record.role == "candidate"]
     for record in records:
-        by_item[record.item_key].append(record)
+        if record.role != "candidate":
+            if _usable(record):
+                references[record.item_key].append(record)
+            continue
+        items[record.item_key].append(record)
         by_judge[record.judge_key].append(record)
-    judge_summaries = {key: _judge_disagreement(group) for key, group in by_judge.items()}
+        if _usable(record):
+            attempts[record.item_key].append(record)
+    return Index(items, attempts, references,
+                 {key: _judge_disagreement(group) for key, group in by_judge.items()})
+
+
+def _error_finding(record: Record, kind: str, label: str, strength: float, observed: str) -> Finding | None:
+    if record.error_kind != kind or record.score == 1:
+        return None
+    return Finding(label, strength, {"observed": observed, "error": record.error})
+
+
+def setup_error(record: Record) -> Finding | None:
+    return _error_finding(record, "setup", "setup_error", 0.85,
+                          "The harness recorded a setup or configuration error for this attempt.")
+
+
+def grader_error(record: Record) -> Finding | None:
+    return _error_finding(record, "grader", "grader_error", 0.85,
+                          "The harness recorded that the verifier did not produce a result for this attempt.")
+
+
+def unclassified_error(record: Record) -> Finding | None:
+    return _error_finding(record, "unknown", "unclassified_error", 0.40,
+                          "The harness recorded an error that the format does not classify.")
+
+
+def _references(record: Record, index: Index) -> list[Record]:
+    """Usable reference results for this check, leaving out other task versions."""
+    return [p for p in index.references.get(record.item_key, ())
+            if None in (p.task_version, record.task_version) or p.task_version == record.task_version]
+
+
+def _reference_runs(references: Sequence[Record]) -> list[dict]:
+    return [{"system": p.system, "run_id": p.run_id, "score": p.score} for p in references]
+
+
+def reference_flaky(record: Record, index: Index) -> Finding | None:
+    references = _references(record, index)
+    passes = sum(p.score == 1 for p in references)
+    if record.score == 1 or not passes or passes == len(references):
+        return None
+    return Finding("reference_flaky", 0.85, {
+        "observed": f"The reference solution passed {passes} of {len(references)} attempts.",
+        "reference_runs": _reference_runs(references),
+    })
+
+
+def reference_fails(record: Record, index: Index) -> Finding | None:
+    references = _references(record, index)
+    if record.score == 1 or not references or any(p.score == 1 for p in references):
+        return None
+    versioned = record.task_version is not None and all(p.task_version is not None for p in references)
+    strength = 0.90 if len(references) >= 2 else 0.75
+    return Finding("reference_fails", strength if versioned else min(strength, 0.60), {
+        "observed": f"The reference solution did not pass in {len(references)} of {len(references)} attempts.",
+        "reference_runs": _reference_runs(references),
+        "task_version": "same as this attempt" if versioned else "task version not available",
+    })
+
+
+def attempts_flip(record: Record, index: Index) -> Finding | None:
+    if record.score == 1 or not _usable(record):
+        return None
+    runs: dict[str, bool] = {}
+    for peer in index.attempts.get(record.item_key, ()):
+        if peer.system == record.system:
+            runs[peer.run_id] = runs.get(peer.run_id, False) or peer.score == 1
+    passed = sorted(run for run, ok in runs.items() if ok and run != record.run_id)
+    if not passed:
+        return None
+    return Finding("attempts_flip", 0.40, {
+        "observed": f"This system passed {len(passed)} of {len(runs)} attempts.",
+        "passes": len(passed), "attempts": len(runs), "passed_run_ids": passed,
+        "other_run_ids": sorted(run for run in runs if run not in passed),
+        "scope": "The results do not say whether the system, the task or the grader differs between attempts.",
+    })
+
+
+_RULES: dict[str, Callable[[Record, Index, Reasoner], Finding | None]] = {
+    "infra": lambda record, index, reasoner: infra(record),
+    "setup_error": lambda record, index, reasoner: setup_error(record),
+    "grader_error": lambda record, index, reasoner: grader_error(record),
+    "judge_unstable": lambda record, index, reasoner: _judge_finding(record, index.judges[record.judge_key]),
+    "reference_flaky": lambda record, index, reasoner: reference_flaky(record, index),
+    "reference_fails": lambda record, index, reasoner: reference_fails(record, index),
+    "item_everyone_loses": lambda record, index, reasoner: item_everyone_loses(record, index.items[record.item_key]),
+    "unstated_requirement": lambda record, index, reasoner: unstated_requirement(record, reasoner),
+    "attempts_flip": lambda record, index, reasoner: attempts_flip(record, index),
+    "unclassified_error": lambda record, index, reasoner: unclassified_error(record),
+}
+# One detector per label except the default, in LABELS order. A label without a rule fails at import.
+DETECTORS = tuple((name, _RULES[name]) for name in CLASSES[:-1])
+
+
+def triage(records: Sequence[Record], reasoner: Reasoner | None = None) -> list[dict]:
+    """Every finding for each failed or ungraded candidate record; the first is the verdict."""
+    reasoner = reasoner if reasoner is not None else HeuristicReasoner()
+    index = build_index(records)
     verdicts = []
     for record in records:
-        if record.score == 1:
+        if record.role != "candidate" or record.score == 1:
             continue
-        findings = sorted((f for f in (
-            infra(record), _judge_finding(record, judge_summaries[record.judge_key]),
-            item_everyone_loses(record, by_item[record.item_key]),
-            unstated_requirement(record, reasoner),
-        ) if f is not None), key=lambda f: CLASSES.index(f.label))
-        selected = findings[0] if findings else Finding(CLASSES[-1], 0.50, {
+        findings = [f for f in (rule(record, index, reasoner) for _, rule in DETECTORS) if f is not None]
+        default = {
             "score": record.score, "rubric_quote": record.rubric_item_text,
             "output_quote": record.output, "judge_reasoning_quote": record.judge_reasoning,
             "note": "No precision-first detector fired. Default, not a proven model failure.",
-        })
+        }
+        if record.error:
+            default["error"] = record.error
+        selected = findings[0] if findings else Finding(CLASSES[-1], 0.50, default)
         verdicts.append({"record_id": record.record_id, "record": record_dict(record),
                          **asdict(selected), "matches": [asdict(f) for f in findings]})
     return verdicts

@@ -27,8 +27,8 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(len({r.task_id for r in self.records}), 3)
         self.assertEqual({r.model for r in self.records}, {"alpha", "beta", "gamma"})
         self.assertEqual({r.judge_run for r in self.records}, {1, 2})
-        self.assertEqual({row["class"]: row["lost_items"] for row in self.report["by_class"]},
-                         dict(zip(CLASSES, (4, 1, 6, 4, 6))))
+        self.assertEqual({row["class"]: row["lost_items"] for row in self.report["by_class"]}, dict.fromkeys(CLASSES, 0) |
+                         {"infra": 4, "judge_unstable": 1, "item_everyone_loses": 6, "unstated_requirement": 4, "genuine_failure": 6})
         self.assertEqual(self.report["lost_points"], 21)
         # A formal greeting mismatch has no hidden anchors and some models pass.
         controls = [v for v in self.report["items"] if v["record"]["rubric_item_id"] == "formal"]

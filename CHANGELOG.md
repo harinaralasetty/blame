@@ -19,6 +19,20 @@ Notable changes to `blame`. Versions follow `pyproject.toml`.
 - Markdown and HTML reports gain a "Failed tasks" section, group by system (agent
   and model) and print `confidence` as "rule strength".
 - `report` and `label` accept `--format auto|generic|inspect`.
+- Six new labels, eleven in all: `setup_error`, `grader_error`, `reference_flaky`,
+  `reference_fails`, `attempts_flip`, `unclassified_error`. `by_class`, each
+  `by_model` row and the `blame score` output grow by these six keys; `human_label`
+  accepts them and 0.1.0 label files still score.
+- Behaviour change: an input with repeated runs of one system on a task, including
+  Inspect logs with epochs (`run_id/epoch-N`), can now get `attempts_flip` as the
+  verdict where 0.1.0 said `genuine_failure`.
+- A record with `error_kind` set is labelled from that class (`infra` at strength
+  0.80) and the 0.1.0 "any error is infra" rule no longer applies to it.
+- `item_everyone_loses` counts systems (agent and model), ignores ungraded and
+  excluded attempts, abstains across task versions, and for records with optional
+  keys scales its strength with the number of systems. Unchanged for 0.1.0 inputs.
+- `fixtures/v2.jsonl` exercises every label; goldens in `tests/golden/v2.report.*`
+  are rewritten only with `UPDATE_GOLDEN=1 make test`.
 
 ## 0.1.0
 

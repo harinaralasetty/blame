@@ -4,14 +4,15 @@ The files in tests/golden/v1 were produced by that code and are never regenerate
 """
 
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
 
 from blame_cli.inputs import load_inputs
 from blame_cli.labels import write_labels
-from blame_cli.model import V1_FIELDS
-from blame_cli.reports import build_report
+from blame_cli.model import CLASSES, V1_FIELDS
+from blame_cli.reports import build_report, markdown
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,6 +68,41 @@ class V1GoldenTests(unittest.TestCase):
             path = Path(tmp) / "labels.csv"
             write_labels(report_for("fixtures/synthetic.jsonl"), str(path))
             self.assertEqual(path.read_bytes(), (GOLDEN / "v1/synthetic.labels.csv").read_bytes())
+
+
+BANNED_WORDING = ("broken test", "bad task", "flaky grader", "model at fault")
+
+
+def check_golden(case: unittest.TestCase, name: str, report: dict) -> None:
+    """Compare a report with tests/golden/<name>.report.{json,md}.
+
+    UPDATE_GOLDEN=1 make test rewrites them; review the diff before committing.
+    """
+    texts = {"json": json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
+             "md": markdown(report)}
+    for suffix, text in texts.items():
+        path = GOLDEN / f"{name}.report.{suffix}"
+        if os.environ.get("UPDATE_GOLDEN") == "1":
+            path.write_text(text, encoding="utf-8")
+        case.assertEqual(text, path.read_text(encoding="utf-8"), f"{path.name} differs")
+        for phrase in BANNED_WORDING:
+            case.assertNotIn(phrase, text.lower())
+    case.assertNotIn("/Users/", texts["json"])
+    case.assertNotIn("/home/", texts["json"])
+
+
+class V2GoldenTests(unittest.TestCase):
+    def test_v2_fixture_report(self):
+        report = report_for("fixtures/v2.jsonl")
+        check_golden(self, "v2", report)
+        # Every label is the verdict of at least one item.
+        self.assertEqual({item["label"] for item in report["items"]}, set(CLASSES))
+        self.assertEqual([row["class"] for row in report["by_class"]], list(CLASSES))
+        for item in report["items"]:
+            if item["label"] not in ("infra", "judge_unstable", "unstated_requirement", "genuine_failure"):
+                self.assertIn("observed", item["evidence"])
+        for row in report["by_task"]:
+            self.assertTrue(row["next_step"].endswith("."))
 
 
 ARENA_HARD = ROOT / "data/arena_hard/generic.jsonl"
