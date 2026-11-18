@@ -1,5 +1,7 @@
 # blame
 
+By [Hari Naralasetty](https://github.com/harinaralasetty) · [LinkedIn](https://www.linkedin.com/in/harinaralasetty)
+
 **blame found changed judge preferences in 500 of 1,500 answer pairs (33.3%) when answer order was swapped.** Of those, 268 pairs reversed winner outright; 232 changed between a tie and a win/loss. These are historical published Arena-Hard v0.1 results, not new model runs. [Read the findings and reproduction steps](realdata/FINDINGS.md).
 
 One example: the same answer used a regex without a fixed video ID length. Before swapping answer order, the judge wrote:
