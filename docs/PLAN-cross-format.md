@@ -312,3 +312,46 @@ Each milestone is one commit with its docs. `B=$(mktemp -d)`. M4 and M5 are inde
 | 13 | Applied; top strength 0.90 instead of the suggested 0.95, per the instruction to lower over-confident numbers |
 | 18 | Applied: `noop`, step records, extra reward keys, case study and the submission layout cut; `next_step` only in the per-task table. Shipping one format per release: rejected, both stay in this plan as separate milestones, shippable after either |
 | 19 | Applied (P7 fix in M2, negative detection test, CI 3.14, line count). `--reference NAME` deferred |
+
+## Deviations from plan
+
+Recorded by the builder of M1 to M6. Each is the smallest decision that fit the plan's intent. M7 was not done.
+
+Model, report and detectors (M1 to M3):
+- `ungraded_items` was also added to every `by_class` and `by_model` row, so an ungraded attempt is countable per label and per system; the plan named only the top-level key.
+- In HTML the "Failed tasks" rows are a list, not a table.
+- `tests/test_review_round1.py`: the one edited line builds its expected record through `Record.from_dict(...)` instead of `record_dict`, since the v2 dataclass has more fields than the v1 JSON.
+- `tests/test_workflow.py` lines 30 and 31 changed in M3: the per-class key lists there grow by the six new labels.
+- The `error_kind` consistency check is keyed on the attempt and `judge_run`, so two gradings of one output may record different classes.
+- `item_everyone_loses` keeps records that a 0.1.0 `infra` rule matches in its cohort, as 0.1.0 did (needed for unchanged v1 output); the reference rules and `attempts_flip` leave them out. Records with `error_kind` `infra`, `setup` or `grader` are left out everywhere, as planned.
+- `by_task[].primary_label` is the most frequent headline label on the task.
+- The reference sentence counts scored reference records. The task-version filter for reference rules is also applied to `reference_flaky`.
+- The plan's fixture label for `fixtures/v2.jsonl` is in a sibling file `fixtures/v2.README.md` ("Hand-written, not harness output."), because JSONL has no comment syntax and no commit applies.
+- The Arena-Hard totals test was added in M1, not M3, so every milestone is checked by it.
+- `realdata/FINDINGS.md` has its test count updated at each milestone.
+- `judge_key` still uses `model`, not `system`, to keep 0.1.0 grouping; two agents on one model with identical output and run id would share a judge group.
+- Markdown still prints `None` for an absent `error` or `judge_run`, as 0.1.0 did.
+
+Harbor (M4):
+- `RegradeError` (kind `unknown`) is treated as not having a counted reward, as in Harbor's table; the plan's "unlisted name = usable" covers names outside the table only.
+- `policy_override.has_valid_reward` decides whether the reward counts when neither `reward_valid` nor `exception_info.policy` is present.
+- `run_id` is the bare trial name when `id` is missing.
+- A trial file with a wrong field type (for example an empty `task_name`) is a `ValueError` naming the file; only files that are not JSON objects are skipped with a warning.
+- After `merge`, the records of a merged format sit at the position of that format's first input.
+- The fixture has two tasks and both have a reference problem, so `unclassified_error`, `attempts_flip` and `item_everyone_loses` appear there as secondary matches, not as headlines.
+- `redact` lives in `blame_cli/formats/__init__.py`, the only place both readers can import it from without a new module.
+
+SWE-bench (M5):
+- A `report.json` that is not a report for its instance is skipped with one warning (the plan's general rule), not turned into an ungraded record, although the harness lists such an instance in `error_ids`.
+- `infra_failure: true` with no reason gives the error text "SWE-bench log pattern: no reason recorded".
+- A run directory is recognised by a valid `report.json` two levels down or by a `results.json`, so a run with only a summary can be read with `--format swebench`.
+- With `--format auto` detection, a missing `patch.diff` warns for ungraded instances too.
+- Warnings name files relative to the given path; the same run given directly or through its parent has the same items and different warning prefixes.
+- An id in `results.json` that is not a plain directory name is ignored.
+
+Release (M6):
+- The `harbor analyze` sentence in the README was checked against the Harbor source at the pinned commit (`src/harbor/analyze/analyzer.py`), not against Harbor's documentation, which was not available offline.
+- `.gitignore` gained `demo-harbor/` and `demo-swebench/`, the output directories the README quickstart writes.
+- The README keeps its existing structure; it was not restyled to the house template.
+- The README commands that create a virtual environment and install the package were not run (no installs and no network in the build session); the `./blame`, `python3 -m blame_cli` and `make` commands were.
+

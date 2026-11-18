@@ -3,6 +3,8 @@ __pycache__/
 .venv/
 demo/
 demo-inspect/
+demo-harbor/
+demo-swebench/
 labels.csv
 validation/
 data/

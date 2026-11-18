@@ -1,5 +1,7 @@
 # Public result adapters
 
+Converters for published datasets live here. Readers for result formats that `blame` opens directly (generic JSONL, Inspect, Harbor, SWE-bench) are in `blame_cli/formats/`.
+
 ## Arena-Hard v0.1
 
 `arena_hard.py` imports published judgments, not locally generated model answers or

@@ -12,7 +12,7 @@ After the swap, it preferred the other answer:
 
 The candidate went from a win to a loss. Both explanations also noticed a real defect: neither regex specifically targeted `href` attributes. A judge issue and a model bug can coexist. [Source example and context](realdata/FINDINGS.md#1-the-same-regex-choice-wins-then-loses).
 
-blame is a local Python CLI for reviewing lost eval credit. It groups observations into infrastructure signals, judge disagreements, items where every supplied model scores zero, possible unstated requirements, and unclassified losses. Reports include quoted evidence and counts so you can check each hypothesis. No model API calls, API keys or runtime dependencies.
+blame is a local Python CLI for reviewing lost eval credit. It sorts failed attempts by what the result files record: an infrastructure, setup or grader error the harness wrote down, two gradings of one output that disagree, a reference solution that failed or passed only sometimes, an item on which no supplied system scored above zero, a system that both passed and failed a task, a possible unstated requirement, and losses no rule explains. Reports include quoted evidence and counts so you can check each hypothesis. No model API calls, API keys or runtime dependencies.
 
 **[Preview a trimmed real report](docs/report.html)**: download and open the HTML locally. It contains the full-run tables and one audited example, with expandable evidence, embedded styles and no scripts or external assets. GitHub's file view shows the HTML source. [Markdown report](realdata/arena_hard/report.md) is also readable on GitHub.
 
@@ -32,7 +32,23 @@ Install from this checkout. The PyPI project named `blame` belongs to another to
 
 ## Use your own results
 
-Accepts generic JSONL or a documented subset of Inspect v2 text JSON. Binary `.eval` files and tool-only outputs are unsupported. A Harbor trial or job directory, or a SWE-bench harness run directory, can also be given (`blame report path/to/dir --out DIR`). Both readers are unverified against real harness output, and they copy error messages, test output and patches into the report. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation. Optional keys can name the agent, mark a reference-solution run, carry the harness error class and mark an attempt as never graded (`score: null`).
+| Input | What to pass | Status |
+| --- | --- | --- |
+| Generic JSONL | a `.jsonl` file | tested on synthetic fixtures and the public Arena-Hard conversion |
+| Inspect v2 text JSON | a log from `inspect eval --log-format json` | a documented subset; fixture hand-written, not validated by `inspect_ai` |
+| Harbor | a trial directory, a job directory or a directory of jobs | unverified against real harness output |
+| SWE-bench harness | a run directory under `logs/evaluation`, or that directory | unverified against real harness output |
+
+The format is detected per input; `--format` forces one. The Harbor and SWE-bench readers were written from the harness source code and tested only on hand-written fixtures, so check a report against your own files before relying on it. The two fixtures show the shape (run from the checkout):
+
+```text
+./blame report fixtures/harbor-job --out demo-harbor
+./blame report fixtures/swebench-eval --out demo-swebench
+```
+
+Reports copy error messages, test output, log lines and patches from the result files. Home-directory paths in that text are shortened to `~` and nothing else is removed, so read a report before sharing it. Harbor's own `harbor analyze` has a model read each trial against a rubric; blame makes no model calls and only sorts what the result files already record.
+
+Binary Inspect `.eval` files, tool-only outputs and the SWE-bench public submissions layout are unsupported. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation. Optional keys can name the agent, mark a reference-solution run, carry the harness error class and mark an attempt as never graded (`score: null`).
 
 After activating the venv, the workflow is:
 
@@ -42,7 +58,7 @@ blame label IN... --out labels.csv
 blame score labels.csv
 ```
 
-`label` leaves `human_label` blank. Fill it after reviewing the evidence, then `score` measures precision and recall on that labeled subset. It does not produce ground truth for you. See the [input schema, Inspect mapping, detector rules and confidence values](docs/reference.md). To run the standard-library test suite, use `make test` (requires Make).
+`label` leaves `human_label` blank. Fill it after reviewing the evidence, then `score` measures precision and recall on that labeled subset. It does not produce ground truth for you. See the [input schema, the Inspect, Harbor and SWE-bench mappings, the eleven labels and their rule strengths](docs/reference.md). To run the standard-library test suite, use `make test` (requires Make).
 
 ## What blame does not do
 
@@ -50,6 +66,9 @@ blame score labels.csv
 - **Establish real-world precision or recall.** Codex checked 20 fired verdicts: 12/12 disagreement flags and 8/8 cohort-loss flags matched their documented predicates. This was not independent human annotation. Default cases were not audited; no recall or eval-fault attribution precision was measured.
 - **Diagnose positional bias from a swap alone.** Order changed between the two games. The result does not separate position effects from other judge variability or identify the correct winner.
 - **Prove an eval item is wrong because everyone loses.** The run found 34 such prompts across three supplied candidates; GPT-4 0314 was their fixed comparator and was excluded from the scored cohort. Shared losses can reflect real candidate defects.
+- **Say a task is broken, a grader is flaky or a model is at fault.** Result files support narrower statements: the harness recorded an error of a given type, two gradings of one output disagree, the reference solution did not pass or passed only sometimes, no supplied system scored above zero, a system both passed and failed a task. A flip between two attempts of a stochastic agent is not evidence about the grader. An `infra` label is only as right as the harness's record or its log heuristic.
+- **Separate a real model failure from a reference problem.** When the reference fails on a task, that fact becomes the headline of every failed attempt on it, including attempts that failed on their own account.
+- **Run anything.** blame never reruns a reference solution or a do-nothing agent. Run those with the harness and pass the result directories in; reference runs are read.
 - **Understand requirements semantically or calibrate confidence.** The shipped reasoner checks literal anchors and abstains on some ambiguous wording. Confidence values are fixed heuristic strengths, not probabilities of correct attribution.
 
 ## Architecture
@@ -66,7 +85,7 @@ blame score labels.csv
 
 - Scores below 1 mean lost credit. Each judge observation is counted separately; repeated judging is not another generation attempt. Arena-Hard scores map relative preferences to win=1, tie=0.5, loss=0, not rubric correctness or leaderboard scores.
 - Task, rubric, model and run IDs are comparable across supplied inputs. Judge instability needs explicit distinct judge IDs with unchanged generation, instruction and rubric. Missing models and runs cannot be inferred.
-- Instructions include all requirements needed to assess the rubric. A nonempty error field represents an active failure.
+- Instructions include all requirements needed to assess the rubric. A nonempty error field with no `error_kind` represents an active failure.
 - Inputs and reports fit in memory. This is a tool for local text eval review.
 - There are no runtime or test dependencies. `setuptools>=77` is the sole build dependency: it builds the wheel, installs the console script and supports the MIT license metadata. pip supplies it in an isolated build environment.
 

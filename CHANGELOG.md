@@ -2,7 +2,10 @@
 
 Notable changes to `blame`. Versions follow `pyproject.toml`.
 
-## Unreleased
+## 0.2.0
+
+Cross-format input and report schema 2. Outputs for 0.1.0 inputs are unchanged except
+where an entry below says "Behaviour change".
 
 - Input parsers moved into `blame_cli/formats/` (`generic`, `inspect_json`) behind a
   small registry; `blame_cli/inputs.py` keeps `load_inputs` and `inspect_records`.
@@ -46,6 +49,7 @@ Notable changes to `blame`. Versions follow `pyproject.toml`.
   so `judge_unstable` reports a changed result. It is unverified against real harness
   output and tested on the hand-written `fixtures/swebench-eval` only. The public
   submissions layout is not read.
+- CI also runs on Python 3.14.
 - A directory as `IN` is no longer always an error; a directory no reader
   recognises is still one, and the message says what was looked for.
 
