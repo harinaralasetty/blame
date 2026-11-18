@@ -1,0 +1,7 @@
+diff --git a/widgets/trim.py b/widgets/trim.py
+--- a/widgets/trim.py
++++ b/widgets/trim.py
+@@ -1,2 +1,2 @@
+ def trim(value):
+-    return value
++    return value.strip()

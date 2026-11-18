@@ -1,0 +1,7 @@
+diff --git a/widgets/scale.py b/widgets/scale.py
+--- a/widgets/scale.py
++++ b/widgets/scale.py
+@@ -1,2 +1,2 @@
+ def scale(value):
+-    return value
++    return value + value

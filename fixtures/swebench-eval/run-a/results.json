@@ -1,0 +1,49 @@
+{
+    "completed_instances": 3,
+    "incomplete_instances": 2,
+    "empty_patch_instances": 1,
+    "submitted_instances": 6,
+    "resolved_instances": 0,
+    "unresolved_instances": 3,
+    "infra_failure_instances": 1,
+    "ambiguous_failure_instances": 0,
+    "error_instances": 2,
+    "completed_ids": [
+        "example__widgets-101",
+        "example__widgets-102",
+        "example__widgets-103"
+    ],
+    "incomplete_ids": [
+        "example__widgets-107",
+        "example__widgets-109"
+    ],
+    "empty_patch_ids": [
+        "example__widgets-104"
+    ],
+    "submitted_ids": [
+        "example__widgets-101",
+        "example__widgets-102",
+        "example__widgets-103",
+        "example__widgets-104",
+        "example__widgets-105",
+        "example__widgets-106"
+    ],
+    "resolved_ids": [],
+    "unresolved_ids": [
+        "example__widgets-101",
+        "example__widgets-102",
+        "example__widgets-103"
+    ],
+    "infra_failure_ids": [
+        "example__widgets-103"
+    ],
+    "ambiguous_failure_ids": [],
+    "error_ids": [
+        "example__widgets-105",
+        "example__widgets-106"
+    ],
+    "failure_reasons": {
+        "example__widgets-103": "out_of_memory"
+    },
+    "schema_version": 2
+}

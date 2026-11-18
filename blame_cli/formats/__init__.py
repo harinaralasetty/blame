@@ -19,11 +19,11 @@ def redact(text: str) -> str:
     return _HOME.sub("~", text)
 
 
-from . import generic, harbor, inspect_json  # noqa: E402  (readers import redact from this module)
+from . import generic, harbor, inspect_json, swebench  # noqa: E402  (readers import redact from this module)
 
 
 # Detection order: the first reader whose detect() accepts the path wins.
-READERS = {"harbor": harbor, "inspect": inspect_json, "generic": generic}
+READERS = {"harbor": harbor, "swebench": swebench, "inspect": inspect_json, "generic": generic}
 FORMATS = tuple(READERS)
 
 

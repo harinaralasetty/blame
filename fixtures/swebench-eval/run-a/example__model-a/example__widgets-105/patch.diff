@@ -1,0 +1,7 @@
+diff --git a/widgets/split.py b/widgets/split.py
+--- a/widgets/split.py
++++ b/widgets/split.py
+@@ -1,2 +1,2 @@
+ def split(value):
+-    return value
++    return value.split()

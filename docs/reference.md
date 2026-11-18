@@ -5,12 +5,12 @@ See the [README](../README.md) for setup, public findings and limits.
 ## Commands
 
 ```text
-./blame report IN... --out DIR [--format auto|generic|harbor|inspect]
-./blame label IN... --out labels.csv [--format auto|generic|harbor|inspect]
+./blame report IN... --out DIR [--format auto|generic|harbor|inspect|swebench]
+./blame label IN... --out labels.csv [--format auto|generic|harbor|inspect|swebench]
 ./blame score labels.csv
 ```
 
-`--format` names the reader for every `IN`. The default `auto` detects it per input, first match wins: a directory is `harbor` if a `result.json` in it, one level down or two levels down is an object with `trial_name` and `agent_info`, and is otherwise an error that names what was looked for; a file ending `.eval` is rejected; a file holding one JSON object is `generic` if it has `task_id`, else `inspect` if it has `eval` or `samples`; anything else is read as generic JSONL. Readers live in `blame_cli/formats/`.
+`--format` names the reader for every `IN`. The default `auto` detects it per input, first match wins: a directory is `harbor` if a `result.json` in it, one level down or two levels down is an object with `trial_name` and `agent_info`, else `swebench` if a `report.json` two or three levels down has exactly one top-level key, equal to the name of the directory holding it, whose value has `resolved`, and is otherwise an error that names both things looked for; a file ending `.eval` is rejected; a file holding one JSON object is `generic` if it has `task_id`, else `inspect` if it has `eval` or `samples`; anything else is read as generic JSONL. Readers live in `blame_cli/formats/`.
 
 The executable is named `blame`; use `./blame` from this checkout or put this directory on PATH. `python3 -m blame_cli` is equivalent. Inputs may mix formats. Errors return status 2 with the input path and, for JSONL, the line number. Files are read before any reports are written. Exact duplicate records are ignored with a warning.
 
@@ -106,6 +106,33 @@ Name table, copied from `error_policy.py` at that commit. The same table is used
 - `unknown`: `RegradeError` (its meaning was not checked; the reward is not counted, as in Harbor's table) and every name not listed.
 
 An unreadable `result.json` is skipped with one warning; a directory with no readable trial is an error. A trial with a wrong field type, such as an empty `task_name`, is an error naming the file. When the same trial (same task, system and `run_id`) is supplied under two job directories it was read twice: the first copy is kept, with a warning. Harbor retries reuse the trial name and replace the earlier attempt, so several trials of one system on one task in a job are separate attempts, and `attempts_flip` compares them.
+
+## SWE-bench mapping
+
+**The SWE-bench reader is unverified against real harness output.** It was written from a reading of the harness source at [`SWE-bench/SWE-bench@02e7a74ffd0b707aab73d203fe87bdc7c76afc8e`](https://github.com/SWE-bench/SWE-bench/tree/02e7a74ffd0b707aab73d203fe87bdc7c76afc8e) (`swebench/harness/grading.py`, `run_evaluation.py`, `reporting.py`, `infra_failure.py`, `constants/__init__.py`, `utils.py`). No evaluation was run and no SWE-bench package or data was installed. `fixtures/swebench-eval` is hand-written from that reading.
+
+Only the harness layout is read: `<run_id>/<model_dir>/<instance_id>/{report.json, patch.diff, run_instance.log}` and the run summary `<run_id>/results.json`, as the harness leaves them under `logs/evaluation`. `IN` is one run directory or a directory of run directories. The layout of the public submissions repository is not read. Each instance gives one record.
+
+| SWE-bench source | Record field |
+| --- | --- |
+| instance directory name, which is also the single key of `report.json` | `task_id` |
+| `<model_dir>` name | `model`; `role: "reference"` when it is `gold`. |
+| `<run_id>` directory name, taken from the resolved path | `job_id` |
+| `patch:` and the first 12 hex characters of the SHA-256 of `patch.diff` | `run_id`. When the file is missing the `job_id` is used and a warning is given. |
+| `patch.diff` | `output` |
+| `resolved` | `rubric_item_id: "resolved"`; `score` 1 or 0. |
+| `infra_failure: true`, with `infra_failure_reason` | `error_kind: "infra"`, `error` is `SWE-bench log pattern: <reason>`. The score stays 0, as in the harness. |
+| `infra_failure_reason` set and `infra_failure: false` | `error_kind: "unknown"`, the same `error` text. |
+| `patch_exists`, `patch_successfully_applied`, `tests_status` counts and up to 20 failed test names per group | `judge_reasoning`. `patch_successfully_applied: false` is worded as "no parseable test output", which is what the harness means by it. |
+| `results.json` `empty_patch_ids` | a record with `output: ""`, `score: 0`, `error: "empty patch"`, `error_kind: "agent"`, `run_id: "patch:empty"`. The harness counts an empty patch as submitted and not resolved. |
+| `results.json` `error_ids`, or an instance directory, without `report.json` | `score: null`, `error` is the last 5 lines of `run_instance.log` (or `no report.json`), `error_kind: "unknown"`. |
+| `results.json` `incomplete_ids` | one warning with the count. |
+| no `results.json` | a warning: empty patches and harness errors without an instance directory are not visible. |
+| not in the results | `instruction`, `rubric_item_text`, `agent` and `task_version` are `null`. |
+
+An id from `results.json` is given to a model only when the run has one model directory or the instance directory exists under a model; otherwise it is skipped and counted in one warning. A `report.json` that cannot be read as a report for its instance is skipped with one warning. Patches, log lines and test names are copied with `/Users/<name>`, `/home/<name>` and `C:\Users\<name>` replaced by `~`; the `run_id` is the hash of the file as written.
+
+Records for the same instance, model and patch under different run directories are gradings of one output. They get `judge_run` 1, 2, ... in run-name order, so `judge_unstable` reports a patch that one run resolved and another did not. `blame report logs/evaluation` and `blame report logs/evaluation/run-a logs/evaluation/run-b` give the same items.
 
 ## Report schema 2
 

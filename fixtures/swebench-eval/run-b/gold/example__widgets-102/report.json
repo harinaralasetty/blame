@@ -1,0 +1,34 @@
+{
+    "example__widgets-102": {
+        "patch_is_None": false,
+        "patch_exists": true,
+        "patch_successfully_applied": true,
+        "resolved": false,
+        "infra_failure": false,
+        "tests_status": {
+            "FAIL_TO_PASS": {
+                "success": [
+                    "tests/test_trim.py::test_tabs"
+                ],
+                "failure": [
+                    "tests/test_trim.py::test_newline"
+                ]
+            },
+            "PASS_TO_PASS": {
+                "success": [
+                    "tests/test_trim.py::test_plain",
+                    "tests/test_trim.py::test_inner"
+                ],
+                "failure": []
+            },
+            "FAIL_TO_FAIL": {
+                "success": [],
+                "failure": []
+            },
+            "PASS_TO_FAIL": {
+                "success": [],
+                "failure": []
+            }
+        }
+    }
+}

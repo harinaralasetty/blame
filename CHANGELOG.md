@@ -39,6 +39,13 @@ Notable changes to `blame`. Versions follow `pyproject.toml`.
   against real harness output: written from the Harbor source, tested on the
   hand-written `fixtures/harbor-job` only. Paths under a home directory in copied
   text are shortened to `~`.
+- New reader `swebench` (`--format swebench`, or detected for a directory): reads
+  SWE-bench harness run directories (`report.json`, `patch.diff`,
+  `run_instance.log`, `results.json`), one record per instance, with `gold` as the
+  reference. The same patch graded under two run directories becomes two judge runs,
+  so `judge_unstable` reports a changed result. It is unverified against real harness
+  output and tested on the hand-written `fixtures/swebench-eval` only. The public
+  submissions layout is not read.
 - A directory as `IN` is no longer always an error; a directory no reader
   recognises is still one, and the message says what was looked for.
 

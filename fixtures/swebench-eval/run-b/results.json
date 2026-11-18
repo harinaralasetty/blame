@@ -1,0 +1,46 @@
+{
+    "completed_instances": 4,
+    "incomplete_instances": 0,
+    "empty_patch_instances": 1,
+    "submitted_instances": 5,
+    "resolved_instances": 1,
+    "unresolved_instances": 2,
+    "infra_failure_instances": 0,
+    "ambiguous_failure_instances": 1,
+    "error_instances": 1,
+    "completed_ids": [
+        "example__widgets-101",
+        "example__widgets-102",
+        "example__widgets-108",
+        "example__widgets-110"
+    ],
+    "incomplete_ids": [],
+    "empty_patch_ids": [
+        "example__widgets-104"
+    ],
+    "submitted_ids": [
+        "example__widgets-101",
+        "example__widgets-102",
+        "example__widgets-104",
+        "example__widgets-108",
+        "example__widgets-110"
+    ],
+    "resolved_ids": [
+        "example__widgets-101"
+    ],
+    "unresolved_ids": [
+        "example__widgets-102",
+        "example__widgets-108"
+    ],
+    "infra_failure_ids": [],
+    "ambiguous_failure_ids": [
+        "example__widgets-108"
+    ],
+    "error_ids": [
+        "example__widgets-110"
+    ],
+    "failure_reasons": {
+        "example__widgets-108": "no_tests_collected"
+    },
+    "schema_version": 2
+}

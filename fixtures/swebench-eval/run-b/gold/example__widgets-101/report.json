@@ -1,0 +1,31 @@
+{
+    "example__widgets-101": {
+        "patch_is_None": false,
+        "patch_exists": true,
+        "patch_successfully_applied": true,
+        "resolved": true,
+        "infra_failure": false,
+        "tests_status": {
+            "FAIL_TO_PASS": {
+                "success": [
+                    "tests/test_scale.py::test_double"
+                ],
+                "failure": []
+            },
+            "PASS_TO_PASS": {
+                "success": [
+                    "tests/test_scale.py::test_zero"
+                ],
+                "failure": []
+            },
+            "FAIL_TO_FAIL": {
+                "success": [],
+                "failure": []
+            },
+            "PASS_TO_FAIL": {
+                "success": [],
+                "failure": []
+            }
+        }
+    }
+}

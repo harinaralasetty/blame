@@ -1,0 +1,528 @@
+{
+  "schema_version": 2,
+  "scored_items": 7,
+  "lost_items": 6,
+  "lost_points": 6.0,
+  "ungraded_items": 2,
+  "reference_items": 2,
+  "counting": "Each scored observation below 1 is a lost item, including repeated judges. 2 attempts were never graded and are listed as ungraded.",
+  "confidence_note": "Confidence values are fixed heuristic strengths, not calibrated probabilities.",
+  "warnings": [
+    "fixtures/swebench-eval: run-a/results.json: 2 instances have no prediction (incomplete_ids) and are not in the report.",
+    "fixtures/swebench-eval: run-b/example__model-a/example__widgets-108: no patch.diff; the run id run-b stands in for the patch.",
+    "fixtures/swebench-eval: run-b/example__model-a/example__widgets-110/report.json: unreadable result file skipped (not a JSON report for this instance).",
+    "fixtures/swebench-eval: run-b/results.json: 1 empty-patch or error ids could not be tied to a model directory and were skipped."
+  ],
+  "by_class": [
+    {
+      "class": "infra",
+      "category": "infra",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "setup_error",
+      "category": "setup",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "grader_error",
+      "category": "grader",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "judge_unstable",
+      "category": "grader",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "reference_flaky",
+      "category": "grader",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "reference_fails",
+      "category": "task",
+      "lost_items": 2,
+      "lost_points": 2.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "item_everyone_loses",
+      "category": "task",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "unstated_requirement",
+      "category": "instruction",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "attempts_flip",
+      "category": "unexplained",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "unclassified_error",
+      "category": "unexplained",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 2
+    },
+    {
+      "class": "genuine_failure",
+      "category": "unexplained",
+      "lost_items": 1,
+      "lost_points": 1.0,
+      "ungraded_items": 0
+    }
+  ],
+  "by_model": [
+    {
+      "model": "example__model-a",
+      "scored_items": 7,
+      "lost_items": 6,
+      "lost_points": 6.0,
+      "ungraded_items": 2,
+      "infra": 1,
+      "setup_error": 0,
+      "grader_error": 0,
+      "judge_unstable": 1,
+      "reference_flaky": 0,
+      "reference_fails": 2,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 3,
+      "genuine_failure": 1
+    }
+  ],
+  "by_task": [
+    {
+      "task_id": "example__widgets-101",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "passed 1 of 1 attempts",
+      "labels": {
+        "judge_unstable": 1
+      },
+      "primary_label": "judge_unstable",
+      "category": "grader",
+      "max_confidence": 0.99,
+      "next_step": "Compare the gradings of this output before trusting either score."
+    },
+    {
+      "task_id": "example__widgets-102",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "passed 0 of 1 attempts",
+      "labels": {
+        "reference_fails": 2
+      },
+      "primary_label": "reference_fails",
+      "category": "task",
+      "max_confidence": 0.6,
+      "next_step": "Rerun the reference before scoring systems on this task."
+    },
+    {
+      "task_id": "example__widgets-103",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "infra": 1
+      },
+      "primary_label": "infra",
+      "category": "infra",
+      "max_confidence": 0.8,
+      "next_step": "Rerun the attempt after checking the recorded error or output."
+    },
+    {
+      "task_id": "example__widgets-105",
+      "systems_attempted": 1,
+      "systems_failed": 0,
+      "reference": "no reference run supplied",
+      "labels": {
+        "unclassified_error": 1
+      },
+      "primary_label": "unclassified_error",
+      "category": "unexplained",
+      "max_confidence": 0.4,
+      "next_step": "Read the recorded error; the format does not classify it."
+    },
+    {
+      "task_id": "example__widgets-104",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "genuine_failure": 1
+      },
+      "primary_label": "genuine_failure",
+      "category": "unexplained",
+      "max_confidence": 0.5,
+      "next_step": "Read the output and the grader note; no rule explains this loss."
+    },
+    {
+      "task_id": "example__widgets-106",
+      "systems_attempted": 1,
+      "systems_failed": 0,
+      "reference": "no reference run supplied",
+      "labels": {
+        "unclassified_error": 1
+      },
+      "primary_label": "unclassified_error",
+      "category": "unexplained",
+      "max_confidence": 0.4,
+      "next_step": "Read the recorded error; the format does not classify it."
+    },
+    {
+      "task_id": "example__widgets-108",
+      "systems_attempted": 1,
+      "systems_failed": 1,
+      "reference": "no reference run supplied",
+      "labels": {
+        "unclassified_error": 1
+      },
+      "primary_label": "unclassified_error",
+      "category": "unexplained",
+      "max_confidence": 0.4,
+      "next_step": "Read the recorded error; the format does not classify it."
+    }
+  ],
+  "items": [
+    {
+      "record_id": "665d306ae08831b1fcac4766a528128f5a170c8519b1596973fb98b4d9fdcc5c",
+      "record": {
+        "task_id": "example__widgets-101",
+        "model": "example__model-a",
+        "run_id": "patch:364d4af8f531",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": "diff --git a/widgets/scale.py b/widgets/scale.py\n--- a/widgets/scale.py\n+++ b/widgets/scale.py\n@@ -1,2 +1,2 @@\n def scale(value):\n-    return value\n+    return value * 2\n",
+        "score": 0.0,
+        "judge_reasoning": "patch_exists: true. patch_successfully_applied: true.\nFAIL_TO_PASS: 0 passed, 1 failed (tests/test_scale.py::test_double).\nPASS_TO_PASS: 1 passed, 0 failed.\nFAIL_TO_FAIL: 0 passed, 0 failed.\nPASS_TO_FAIL: 0 passed, 0 failed.",
+        "judge_run": 1,
+        "error": null,
+        "job_id": "run-a"
+      },
+      "label": "judge_unstable",
+      "confidence": 0.99,
+      "evidence": {
+        "output_quote": "diff --git a/widgets/scale.py b/widgets/scale.py\n--- a/widgets/scale.py\n+++ b/widgets/scale.py\n@@ -1,2 +1,2 @@\n def scale(value):\n-    return value\n+    return value * 2\n",
+        "judge_scores": [
+          {
+            "judge_run": 1,
+            "score": 0.0
+          },
+          {
+            "judge_run": 2,
+            "score": 1.0
+          }
+        ],
+        "different_score_pairs": 1,
+        "judge_pairs": 1,
+        "flip_rate": 1.0
+      },
+      "matches": [
+        {
+          "label": "judge_unstable",
+          "confidence": 0.99,
+          "evidence": {
+            "output_quote": "diff --git a/widgets/scale.py b/widgets/scale.py\n--- a/widgets/scale.py\n+++ b/widgets/scale.py\n@@ -1,2 +1,2 @@\n def scale(value):\n-    return value\n+    return value * 2\n",
+            "judge_scores": [
+              {
+                "judge_run": 1,
+                "score": 0.0
+              },
+              {
+                "judge_run": 2,
+                "score": 1.0
+              }
+            ],
+            "different_score_pairs": 1,
+            "judge_pairs": 1,
+            "flip_rate": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "af38197c86f955235c91aab499a973df79840f2969eec221986b64440dc9b6d4",
+      "record": {
+        "task_id": "example__widgets-102",
+        "model": "example__model-a",
+        "run_id": "patch:c81836ef4ef3",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": "diff --git a/widgets/trim.py b/widgets/trim.py\n--- a/widgets/trim.py\n+++ b/widgets/trim.py\n@@ -1,2 +1,2 @@\n def trim(value):\n-    return value\n+    return value.strip()\n",
+        "score": 0.0,
+        "judge_reasoning": "patch_exists: true. patch_successfully_applied: true.\nFAIL_TO_PASS: 0 passed, 2 failed (tests/test_trim.py::test_tabs, tests/test_trim.py::test_newline).\nPASS_TO_PASS: 1 passed, 1 failed (tests/test_trim.py::test_inner).\nFAIL_TO_FAIL: 0 passed, 0 failed.\nPASS_TO_FAIL: 0 passed, 0 failed.",
+        "judge_run": 1,
+        "error": null,
+        "job_id": "run-a"
+      },
+      "label": "reference_fails",
+      "confidence": 0.6,
+      "evidence": {
+        "observed": "The reference solution did not pass in 1 of 1 attempts.",
+        "reference_runs": [
+          {
+            "system": "gold",
+            "run_id": "patch:1a97f9a32c0f",
+            "score": 0.0
+          }
+        ],
+        "task_version": "task version not available"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.6,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "gold",
+                "run_id": "patch:1a97f9a32c0f",
+                "score": 0.0
+              }
+            ],
+            "task_version": "task version not available"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "4d59745f0571bf2984771592749062f6103e24d4376ccd8d8a3f60808102f632",
+      "record": {
+        "task_id": "example__widgets-103",
+        "model": "example__model-a",
+        "run_id": "patch:bea26aa65518",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": "diff --git a/widgets/join.py b/widgets/join.py\n--- a/widgets/join.py\n+++ b/widgets/join.py\n@@ -1,2 +1,2 @@\n def join(value):\n-    return value\n+    return ''.join(value)\n",
+        "score": 0.0,
+        "judge_reasoning": "patch_exists: true. patch_successfully_applied: false.\nThe harness found no parseable test output.",
+        "judge_run": null,
+        "error": "SWE-bench log pattern: out_of_memory",
+        "error_kind": "infra",
+        "job_id": "run-a"
+      },
+      "label": "infra",
+      "confidence": 0.8,
+      "evidence": {
+        "observed": "The harness classified this attempt's error as an infrastructure fault.",
+        "rule": "error_kind",
+        "quote": "SWE-bench log pattern: out_of_memory"
+      },
+      "matches": [
+        {
+          "label": "infra",
+          "confidence": 0.8,
+          "evidence": {
+            "observed": "The harness classified this attempt's error as an infrastructure fault.",
+            "rule": "error_kind",
+            "quote": "SWE-bench log pattern: out_of_memory"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "b39c15a6a1cde044311cde9e5df9835e9ad80eb351abe0853c5ec93f0b0be084",
+      "record": {
+        "task_id": "example__widgets-105",
+        "model": "example__model-a",
+        "run_id": "patch:f002f9743640",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": "diff --git a/widgets/split.py b/widgets/split.py\n--- a/widgets/split.py\n+++ b/widgets/split.py\n@@ -1,2 +1,2 @@\n def split(value):\n-    return value\n+    return value.split()\n",
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Intermediate patch written to ~/logs/patch.diff\nApplying patch\nTraceback (most recent call last):\n  File \"~/harness/run.py\", line 10\nEvaluationError: example__widgets-105: container exited before the tests ran",
+        "error_kind": "unknown",
+        "job_id": "run-a"
+      },
+      "label": "unclassified_error",
+      "confidence": 0.4,
+      "evidence": {
+        "observed": "The harness recorded an error that the format does not classify.",
+        "error": "Intermediate patch written to ~/logs/patch.diff\nApplying patch\nTraceback (most recent call last):\n  File \"~/harness/run.py\", line 10\nEvaluationError: example__widgets-105: container exited before the tests ran"
+      },
+      "matches": [
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "Intermediate patch written to ~/logs/patch.diff\nApplying patch\nTraceback (most recent call last):\n  File \"~/harness/run.py\", line 10\nEvaluationError: example__widgets-105: container exited before the tests ran"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "88122b3c5a4cf72c2c4a0138e88a2a76c2ef9853801c78b4394b33462b5a63c8",
+      "record": {
+        "task_id": "example__widgets-104",
+        "model": "example__model-a",
+        "run_id": "patch:empty",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": "",
+        "score": 0.0,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "empty patch",
+        "error_kind": "agent",
+        "job_id": "run-a"
+      },
+      "label": "genuine_failure",
+      "confidence": 0.5,
+      "evidence": {
+        "score": 0.0,
+        "rubric_quote": null,
+        "output_quote": "",
+        "judge_reasoning_quote": "",
+        "note": "No precision-first detector fired. Default, not a proven model failure.",
+        "error": "empty patch"
+      },
+      "matches": []
+    },
+    {
+      "record_id": "a960b0bd575bd0198cbdd36f16ce49a25ef56faf7e07c1d3ee387fea445ce4f9",
+      "record": {
+        "task_id": "example__widgets-106",
+        "model": "example__model-a",
+        "run_id": "run-a",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "no report.json",
+        "error_kind": "unknown",
+        "job_id": "run-a"
+      },
+      "label": "unclassified_error",
+      "confidence": 0.4,
+      "evidence": {
+        "observed": "The harness recorded an error that the format does not classify.",
+        "error": "no report.json"
+      },
+      "matches": [
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "no report.json"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "a2603ad7c972a44fdb7563b7ee537d54f64165df6355281cdec12994c3823121",
+      "record": {
+        "task_id": "example__widgets-102",
+        "model": "example__model-a",
+        "run_id": "patch:c81836ef4ef3",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": "diff --git a/widgets/trim.py b/widgets/trim.py\n--- a/widgets/trim.py\n+++ b/widgets/trim.py\n@@ -1,2 +1,2 @@\n def trim(value):\n-    return value\n+    return value.strip()\n",
+        "score": 0.0,
+        "judge_reasoning": "patch_exists: true. patch_successfully_applied: true.\nFAIL_TO_PASS: 0 passed, 2 failed (tests/test_trim.py::test_tabs, tests/test_trim.py::test_newline).\nPASS_TO_PASS: 1 passed, 1 failed (tests/test_trim.py::test_inner).\nFAIL_TO_FAIL: 0 passed, 0 failed.\nPASS_TO_FAIL: 0 passed, 0 failed.",
+        "judge_run": 2,
+        "error": null,
+        "job_id": "run-b"
+      },
+      "label": "reference_fails",
+      "confidence": 0.6,
+      "evidence": {
+        "observed": "The reference solution did not pass in 1 of 1 attempts.",
+        "reference_runs": [
+          {
+            "system": "gold",
+            "run_id": "patch:1a97f9a32c0f",
+            "score": 0.0
+          }
+        ],
+        "task_version": "task version not available"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.6,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "gold",
+                "run_id": "patch:1a97f9a32c0f",
+                "score": 0.0
+              }
+            ],
+            "task_version": "task version not available"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "7362124114f01b0820b1450f414705615e5e995009e7aa766d736769f5a8be4e",
+      "record": {
+        "task_id": "example__widgets-108",
+        "model": "example__model-a",
+        "run_id": "run-b",
+        "instruction": null,
+        "rubric_item_id": "resolved",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "patch_exists: true. patch_successfully_applied: false.\nThe harness found no parseable test output.",
+        "judge_run": null,
+        "error": "SWE-bench log pattern: no_tests_collected",
+        "error_kind": "unknown",
+        "job_id": "run-b"
+      },
+      "label": "unclassified_error",
+      "confidence": 0.4,
+      "evidence": {
+        "observed": "The harness recorded an error that the format does not classify.",
+        "error": "SWE-bench log pattern: no_tests_collected"
+      },
+      "matches": [
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "SWE-bench log pattern: no_tests_collected"
+          }
+        }
+      ]
+    }
+  ]
+}

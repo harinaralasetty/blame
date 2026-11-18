@@ -32,7 +32,7 @@ Install from this checkout. The PyPI project named `blame` belongs to another to
 
 ## Use your own results
 
-Accepts generic JSONL or a documented subset of Inspect v2 text JSON. Binary `.eval` files and tool-only outputs are unsupported. A Harbor trial or job directory can also be given (`blame report path/to/job --out DIR`); that reader is unverified against real harness output, and it copies error messages and test output into the report. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation. Optional keys can name the agent, mark a reference-solution run, carry the harness error class and mark an attempt as never graded (`score: null`).
+Accepts generic JSONL or a documented subset of Inspect v2 text JSON. Binary `.eval` files and tool-only outputs are unsupported. A Harbor trial or job directory, or a SWE-bench harness run directory, can also be given (`blame report path/to/dir --out DIR`). Both readers are unverified against real harness output, and they copy error messages, test output and patches into the report. Each generic record describes one task, model, generation run, rubric item, output, score in [0,1], and judge reasoning. Optional judge IDs identify repeated judgments of the same generation. Optional keys can name the agent, mark a reference-solution run, carry the harness error class and mark an attempt as never graded (`score: null`).
 
 After activating the venv, the workflow is:
 

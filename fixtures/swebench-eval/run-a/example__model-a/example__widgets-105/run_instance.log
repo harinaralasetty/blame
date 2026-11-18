@@ -1,0 +1,6 @@
+Creating container for example__widgets-105
+Intermediate patch written to /home/example/logs/patch.diff
+Applying patch
+Traceback (most recent call last):
+  File "/Users/example/harness/run.py", line 10
+EvaluationError: example__widgets-105: container exited before the tests ran

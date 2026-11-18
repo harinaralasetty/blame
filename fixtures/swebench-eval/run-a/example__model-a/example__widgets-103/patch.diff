@@ -1,0 +1,7 @@
+diff --git a/widgets/join.py b/widgets/join.py
+--- a/widgets/join.py
++++ b/widgets/join.py
+@@ -1,2 +1,2 @@
+ def join(value):
+-    return value
++    return ''.join(value)
