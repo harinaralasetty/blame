@@ -1,0 +1,3 @@
+collected 5 items
+FAILED tests/test_sort.py::test_large_input - read /Users/example/work/out.txt
+3 failed, 2 passed in 1.20s

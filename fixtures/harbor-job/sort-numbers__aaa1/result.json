@@ -1,0 +1,30 @@
+{
+  "id": "00000003-0000-4000-8000-000000000000",
+  "task_name": "sort-numbers",
+  "trial_name": "sort-numbers__aaa1",
+  "trial_uri": "file:///home/example/jobs/2026-01-01__00-00-00/sort-numbers__aaa1",
+  "task_id": {
+    "path": "tasks/sort-numbers"
+  },
+  "source": null,
+  "task_checksum": "sha256:1111aaaa",
+  "config": {
+    "trial_name": "sort-numbers__aaa1",
+    "trials_dir": "/home/example/jobs"
+  },
+  "agent_info": {
+    "name": "claude-code",
+    "version": "1.0",
+    "model_info": {
+      "name": "model-a",
+      "provider": "example"
+    }
+  },
+  "verifier_result": {
+    "rewards": {
+      "reward": 0,
+      "tests_passed": 0.4
+    }
+  },
+  "exception_info": null
+}

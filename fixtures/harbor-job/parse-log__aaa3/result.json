@@ -1,0 +1,40 @@
+{
+  "id": "0000000c-0000-4000-8000-000000000000",
+  "task_name": "parse-log",
+  "trial_name": "parse-log__aaa3",
+  "trial_uri": "file:///home/example/jobs/2026-01-01__00-00-00/parse-log__aaa3",
+  "task_id": {
+    "path": "tasks/parse-log"
+  },
+  "source": null,
+  "task_checksum": "sha256:2222bbbb",
+  "config": {
+    "trial_name": "parse-log__aaa3",
+    "trials_dir": "/home/example/jobs"
+  },
+  "agent_info": {
+    "name": "claude-code",
+    "version": "1.0",
+    "model_info": {
+      "name": "model-a",
+      "provider": "example"
+    }
+  },
+  "verifier_result": {
+    "rewards": {
+      "reward": 1
+    }
+  },
+  "exception_info": {
+    "exception_type": "CustomHarnessError",
+    "exception_message": "post-run hook failed",
+    "exception_traceback": "Traceback (most recent call last):\n  File \"/home/example/harbor/trial.py\", line 1\n",
+    "occurred_at": "2026-01-01T00:00:00Z",
+    "policy": {
+      "should_retry": true,
+      "should_grade": true,
+      "has_valid_reward": false
+    }
+  },
+  "reward_valid": false
+}

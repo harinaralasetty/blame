@@ -5,14 +5,14 @@ See the [README](../README.md) for setup, public findings and limits.
 ## Commands
 
 ```text
-./blame report IN... --out DIR [--format auto|generic|inspect]
-./blame label IN... --out labels.csv [--format auto|generic|inspect]
+./blame report IN... --out DIR [--format auto|generic|harbor|inspect]
+./blame label IN... --out labels.csv [--format auto|generic|harbor|inspect]
 ./blame score labels.csv
 ```
 
-`--format` names the reader for every `IN`. The default `auto` detects it per input: a file ending `.eval` is rejected; a file holding one JSON object is `generic` if it has `task_id`, else `inspect` if it has `eval` or `samples`; anything else is read as generic JSONL. Readers live in `blame_cli/formats/`.
+`--format` names the reader for every `IN`. The default `auto` detects it per input, first match wins: a directory is `harbor` if a `result.json` in it, one level down or two levels down is an object with `trial_name` and `agent_info`, and is otherwise an error that names what was looked for; a file ending `.eval` is rejected; a file holding one JSON object is `generic` if it has `task_id`, else `inspect` if it has `eval` or `samples`; anything else is read as generic JSONL. Readers live in `blame_cli/formats/`.
 
-The executable is named `blame`; use `./blame` from this checkout or put this directory on PATH. `python3 -m blame_cli` is equivalent. Inputs may mix generic JSONL and Inspect text JSON. Errors return status 2 with the input path and, for JSONL, the line number. Files are read before any reports are written. Exact duplicate records are ignored with a warning.
+The executable is named `blame`; use `./blame` from this checkout or put this directory on PATH. `python3 -m blame_cli` is equivalent. Inputs may mix formats. Errors return status 2 with the input path and, for JSONL, the line number. Files are read before any reports are written. Exact duplicate records are ignored with a warning.
 
 `label` produces one row per lost or ungraded observation with a stable record ID, instruction, rubric, output, score, judge reasoning, predicted label, all detector matches, confidence, evidence, and an empty `human_label`. Fill only `human_label` with one of the eleven labels listed under [Labels](#labels), then run `score`. Label files written by 0.1.0 still score. Keep predictions and detector matches unchanged.
 
@@ -71,6 +71,41 @@ Use text JSON from `inspect eval --log-format json`. Binary `.eval` files are un
 The metadata keys above are application conventions in Inspect's free-form metadata, not built-in rubric fields. Without rubric metadata, the item text identifies the scorer and says the rubric is unavailable; the unstated requirement detector abstains with an input warning. Samples with no scores are omitted with a warning, without inventing zero scores. Header-only logs, unresolved attachments, and non-text content are rejected. Aggregate results, events, score history, plan, stats, targets, and other fields are not read. Input instructions must include any system or developer requirements needed to assess the rubric.
 
 `fixtures/inspect.json` was hand-written using these documented field shapes. It was not produced or validated by an installed `inspect_ai`. No Inspect package was installed. Tests cover this fixture, chat input, text blocks, dictionary scores, fractional credit, missing rubric text, errors, and unsupported values.
+
+## Harbor mapping
+
+**The Harbor reader is unverified against real harness output.** It was written from a reading of the Harbor source at [`harbor-framework/harbor@3ee9f53e6b459712fdec4e8ce6613d7aa5610299`](https://github.com/harbor-framework/harbor/tree/3ee9f53e6b459712fdec4e8ce6613d7aa5610299) (`src/harbor/models/trial/result.py`, `trial/paths.py`, `trial/error_policy.py`, `verifier/result.py`, `agent/name.py`, `trial/trial.py`). No Harbor run was made and no Harbor package was installed. `fixtures/harbor-job` is hand-written from that reading.
+
+`IN` is a trial directory, a job directory, or a directory of job directories. Only `<trial_dir>/result.json` and `<trial_dir>/verifier/test-stdout.txt` are read; a job-level `result.json` is passed over. Each trial gives one record.
+
+| Harbor field | Record field |
+| --- | --- |
+| `task_name` | `task_id`. The task's `source` is not added, so local and registry runs of one task join. |
+| `task_checksum` | `task_version`. A warning is given when one task has more than one. |
+| `agent_info.name` | `agent`. `oracle` gives `role: "reference"`. A `nop` trial is skipped with a warning. |
+| `agent_info.model_info.provider`, `/`, `.name` | `model`; the provider is optional, and the model is `""` when there is no `model_info`. |
+| name of the directory holding the trial directory | `job_id` |
+| `trial_name`, `@`, first 8 characters of `id` | `run_id`; the bare trial name when `id` is missing. |
+| `verifier_result.rewards["reward"]`; if absent and exactly one key exists, that key | `rubric_item_id: "reward"` and `score`. Other keys are listed in `judge_reasoning` and never scored. |
+| no rewards, no key to choose, or a value that is not a number in [0, 1] | `score: null`, `error` says which, `error_kind: "unknown"` unless an exception sets it. |
+| `exception_info`, else the first `step_results[].exception_info`: `exception_type`, `exception_message` | `error` is `Harbor <type>: <message>`. |
+| `exception_type` looked up in the name table below | `error_kind` |
+| `exception_info.policy_override.has_valid_reward` when set | `true` gives `agent`; `false` on an `agent` name gives `unknown`. The override is quoted in `error`. |
+| whether Harbor counts the reward: the first present of `reward_valid`, `exception_info.policy.has_valid_reward`, then the override or the name table | not counted gives `score: null`. A name outside the table counts, which is Harbor's default. |
+| `verifier/test-stdout.txt`, last 2,000 characters | `judge_reasoning` |
+| not in `result.json` | `instruction`, `rubric_item_text` and `output` are `null`. |
+
+`config`, `trial_uri` and `exception_traceback` are never read. In the text that is copied (exception messages and the test output), `/Users/<name>`, `/home/<name>` and `C:\Users\<name>` are replaced with `~`; everything else is copied as written, so read a report before sharing it.
+
+Name table, copied from `error_policy.py` at that commit. The same table is used for every file, whatever Harbor version wrote it:
+
+- `agent`, where Harbor counts the reward: `NonZeroAgentExitCodeError`, `AgentTimeoutError`, `ContextWindowExceededError`, `OutputTokenExceededError`, `ContextLengthExceededError`, `OutputLengthExceededError`, `AgentSafetyRefusalError`, `ContentPolicyViolationError`.
+- `grader`: `VerifierTimeoutError`, `RewardFileNotFoundError`, `RewardFileEmptyError`, `VerifierOutputParseError`.
+- `infra`: `EnvironmentStartTimeoutError`, `SandboxBuildFailedError`, `AgentSetupTimeoutError`, `HealthcheckError`, `SandboxLikelyOutOfMemoryError`, `MemoryLimitExceededError`, `SSHAccessError`, `GKEExecStreamClosedError`, `GKEPodNotFoundError`, `RuntimeRequestError`, `AddTestsDirError`, `DownloadVerifierDirError`, `ApiError`, `ApiRateLimitError`, `ApiInternalServerError`, `ApiOverloadedError`, `ApiConnectionClosedError`, `ApiResponseStalledError`, `UnknownApiError`, `NetworkConnectionError`, `ApiConnectionError`, `ApiUsageLimitError`, `RateLimitError`, `InternalServerError`, `ServiceUnavailableError`, `APIConnectionError`, `APIError`, `Timeout`, `APIResponseValidationError`.
+- `setup`: `UnsupportedModelParametersError`, `BadRequestError`, `UnprocessableEntityError`, `UnsupportedParamsError`, `BudgetExceededError`, `AgentAuthenticationError`, `ModelNotFoundError`, `ApiProviderResourceNotFoundError`, `AgentVersionTooOldError`, `AuthenticationError`, `PermissionDeniedError`, `NotFoundError`, `ServiceOperationsUnsupportedError`, `VercelScopeError`, `DspyImportError`, `MissingExtraError`, `CancelledError`.
+- `unknown`: `RegradeError` (its meaning was not checked; the reward is not counted, as in Harbor's table) and every name not listed.
+
+An unreadable `result.json` is skipped with one warning; a directory with no readable trial is an error. A trial with a wrong field type, such as an empty `task_name`, is an error naming the file. When the same trial (same task, system and `run_id`) is supplied under two job directories it was read twice: the first copy is kept, with a warning. Harbor retries reuse the trial name and replace the earlier attempt, so several trials of one system on one task in a job are separate attempts, and `attempts_flip` compares them.
 
 ## Report schema 2
 

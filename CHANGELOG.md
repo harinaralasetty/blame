@@ -33,6 +33,14 @@ Notable changes to `blame`. Versions follow `pyproject.toml`.
   keys scales its strength with the number of systems. Unchanged for 0.1.0 inputs.
 - `fixtures/v2.jsonl` exercises every label; goldens in `tests/golden/v2.report.*`
   are rewritten only with `UPDATE_GOLDEN=1 make test`.
+- New reader `harbor` (`--format harbor`, or detected for a directory): reads Harbor
+  trial directories, one record per trial, with the reference agent `oracle`, the
+  harness error class from a fixed name table and ungraded trials. It is unverified
+  against real harness output: written from the Harbor source, tested on the
+  hand-written `fixtures/harbor-job` only. Paths under a home directory in copied
+  text are shortened to `~`.
+- A directory as `IN` is no longer always an error; a directory no reader
+  recognises is still one, and the message says what was looked for.
 
 ## 0.1.0
 

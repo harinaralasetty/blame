@@ -1,0 +1,34 @@
+{
+  "id": "00000004-0000-4000-8000-000000000000",
+  "task_name": "sort-numbers",
+  "trial_name": "sort-numbers__aaa2",
+  "trial_uri": "file:///home/example/jobs/2026-01-01__00-00-00/sort-numbers__aaa2",
+  "task_id": {
+    "path": "tasks/sort-numbers"
+  },
+  "source": null,
+  "task_checksum": "sha256:1111aaaa",
+  "config": {
+    "trial_name": "sort-numbers__aaa2",
+    "trials_dir": "/home/example/jobs"
+  },
+  "agent_info": {
+    "name": "claude-code",
+    "version": "1.0",
+    "model_info": {
+      "name": "model-a",
+      "provider": "example"
+    }
+  },
+  "verifier_result": {
+    "rewards": {
+      "reward": 0
+    }
+  },
+  "exception_info": {
+    "exception_type": "AgentTimeoutError",
+    "exception_message": "Agent execution timed out after 600 seconds",
+    "exception_traceback": "Traceback (most recent call last):\n  File \"/home/example/harbor/trial.py\", line 1\n",
+    "occurred_at": "2026-01-01T00:00:00Z"
+  }
+}

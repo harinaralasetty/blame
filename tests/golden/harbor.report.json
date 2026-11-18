@@ -1,0 +1,861 @@
+{
+  "schema_version": 2,
+  "scored_items": 7,
+  "lost_items": 6,
+  "lost_points": 6.0,
+  "ungraded_items": 5,
+  "reference_items": 3,
+  "counting": "Each scored observation below 1 is a lost item, including repeated judges. 5 attempts were never graded and are listed as ungraded.",
+  "confidence_note": "Confidence values are fixed heuristic strengths, not calibrated probabilities.",
+  "warnings": [
+    "fixtures/harbor-job: parse-log__bad1/result.json: unreadable result file skipped (not valid UTF-8 JSON).",
+    "fixtures/harbor-job: sort-numbers__nop1/result.json: trial of the nop agent skipped; it is not a system under test."
+  ],
+  "by_class": [
+    {
+      "class": "infra",
+      "category": "infra",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "setup_error",
+      "category": "setup",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "grader_error",
+      "category": "grader",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 1
+    },
+    {
+      "class": "judge_unstable",
+      "category": "grader",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "reference_flaky",
+      "category": "grader",
+      "lost_items": 4,
+      "lost_points": 4.0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "reference_fails",
+      "category": "task",
+      "lost_items": 2,
+      "lost_points": 2.0,
+      "ungraded_items": 2
+    },
+    {
+      "class": "item_everyone_loses",
+      "category": "task",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "unstated_requirement",
+      "category": "instruction",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "attempts_flip",
+      "category": "unexplained",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "unclassified_error",
+      "category": "unexplained",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    },
+    {
+      "class": "genuine_failure",
+      "category": "unexplained",
+      "lost_items": 0,
+      "lost_points": 0,
+      "ungraded_items": 0
+    }
+  ],
+  "by_model": [
+    {
+      "model": "claude-code / example/model-a",
+      "scored_items": 3,
+      "lost_items": 3,
+      "lost_points": 3.0,
+      "ungraded_items": 3,
+      "infra": 0,
+      "setup_error": 0,
+      "grader_error": 1,
+      "judge_unstable": 0,
+      "reference_flaky": 2,
+      "reference_fails": 3,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    },
+    {
+      "model": "codex / model-b",
+      "scored_items": 4,
+      "lost_items": 3,
+      "lost_points": 3.0,
+      "ungraded_items": 2,
+      "infra": 1,
+      "setup_error": 1,
+      "grader_error": 0,
+      "judge_unstable": 0,
+      "reference_flaky": 2,
+      "reference_fails": 1,
+      "item_everyone_loses": 0,
+      "unstated_requirement": 0,
+      "attempts_flip": 0,
+      "unclassified_error": 0,
+      "genuine_failure": 0
+    }
+  ],
+  "by_task": [
+    {
+      "task_id": "parse-log",
+      "systems_attempted": 2,
+      "systems_failed": 2,
+      "reference": "passed 0 of 1 attempts",
+      "labels": {
+        "infra": 1,
+        "setup_error": 1,
+        "grader_error": 1,
+        "reference_fails": 7,
+        "item_everyone_loses": 2,
+        "unclassified_error": 2
+      },
+      "primary_label": "reference_fails",
+      "category": "task",
+      "max_confidence": 0.75,
+      "next_step": "Rerun the reference before scoring systems on this task."
+    },
+    {
+      "task_id": "sort-numbers",
+      "systems_attempted": 2,
+      "systems_failed": 2,
+      "reference": "passed 1 of 2 attempts",
+      "labels": {
+        "reference_flaky": 4,
+        "attempts_flip": 2,
+        "unclassified_error": 1
+      },
+      "primary_label": "reference_flaky",
+      "category": "grader",
+      "max_confidence": 0.85,
+      "next_step": "Rerun the reference solution several times before scoring systems on this task."
+    }
+  ],
+  "items": [
+    {
+      "record_id": "56c22bca3be37836933f79b27695c19e202341a78f2a41deff65ca778ac576fb",
+      "record": {
+        "task_id": "parse-log",
+        "model": "example/model-a",
+        "run_id": "parse-log__aaa1@0000000a",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "FAILED tests/test_parse.py::test_timestamps\n1 failed in 0.50s\n",
+        "judge_run": null,
+        "error": null,
+        "agent": "claude-code",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_fails",
+      "confidence": 0.75,
+      "evidence": {
+        "observed": "The reference solution did not pass in 1 of 1 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "parse-log__ref1@00000009",
+            "score": 0.0
+          }
+        ],
+        "task_version": "same as this attempt"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        },
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.5,
+          "evidence": {
+            "observed": "No supplied system scored above zero (2 systems).",
+            "rubric_quote": null,
+            "models": [
+              "claude-code / example/model-a",
+              "codex / model-b"
+            ],
+            "model_count": 2,
+            "observation_count": 2,
+            "run_count": 2,
+            "zero_count": 2,
+            "scores_by_model": {
+              "claude-code / example/model-a": [
+                0.0
+              ],
+              "codex / model-b": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "0fb1ecb9b006666e7a0a2f8e1b96880c2c9038751360cd579f01c213aaf3633a",
+      "record": {
+        "task_id": "parse-log",
+        "model": "example/model-a",
+        "run_id": "parse-log__aaa2@0000000b",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor RewardFileNotFoundError: No reward file found at /logs/verifier/reward.txt; no verifier reward recorded",
+        "agent": "claude-code",
+        "error_kind": "grader",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "grader_error",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The harness recorded that the verifier did not produce a result for this attempt.",
+        "error": "Harbor RewardFileNotFoundError: No reward file found at /logs/verifier/reward.txt; no verifier reward recorded"
+      },
+      "matches": [
+        {
+          "label": "grader_error",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The harness recorded that the verifier did not produce a result for this attempt.",
+            "error": "Harbor RewardFileNotFoundError: No reward file found at /logs/verifier/reward.txt; no verifier reward recorded"
+          }
+        },
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "a9050065b28e8cc89a00c345a4f37df62e312ec944e853b9819ac9f486d1fc7c",
+      "record": {
+        "task_id": "parse-log",
+        "model": "example/model-a",
+        "run_id": "parse-log__aaa3@0000000c",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor CustomHarnessError: post-run hook failed; Harbor does not count the recorded reward (reward=1) for this trial",
+        "agent": "claude-code",
+        "error_kind": "unknown",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_fails",
+      "confidence": 0.75,
+      "evidence": {
+        "observed": "The reference solution did not pass in 1 of 1 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "parse-log__ref1@00000009",
+            "score": 0.0
+          }
+        ],
+        "task_version": "same as this attempt"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        },
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "Harbor CustomHarnessError: post-run hook failed; Harbor does not count the recorded reward (reward=1) for this trial"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "16ec6493ed609fff773cd58aa8e1bb6c7b0a983c05786f9d48c6ff4e193b6a4e",
+      "record": {
+        "task_id": "parse-log",
+        "model": "example/model-a",
+        "run_id": "parse-log__aaa4@0000000d",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "no reward key to score among: precision, recall",
+        "agent": "claude-code",
+        "error_kind": "unknown",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_fails",
+      "confidence": 0.75,
+      "evidence": {
+        "observed": "The reference solution did not pass in 1 of 1 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "parse-log__ref1@00000009",
+            "score": 0.0
+          }
+        ],
+        "task_version": "same as this attempt"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        },
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "no reward key to score among: precision, recall"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "4e127810ebf62a3c399e125a11f5d5e5f2749ff406af2c289f9c60b2ac89004b",
+      "record": {
+        "task_id": "parse-log",
+        "model": "model-b",
+        "run_id": "parse-log__bbb1@0000000e",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor EnvironmentStartTimeoutError: Environment did not start in 600 s; see ~/.cache/harbor/build.log; no verifier reward recorded",
+        "agent": "codex",
+        "error_kind": "infra",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "infra",
+      "confidence": 0.8,
+      "evidence": {
+        "observed": "The harness classified this attempt's error as an infrastructure fault.",
+        "rule": "error_kind",
+        "quote": "Harbor EnvironmentStartTimeoutError: Environment did not start in 600 s; see ~/.cache/harbor/build.log; no verifier reward recorded"
+      },
+      "matches": [
+        {
+          "label": "infra",
+          "confidence": 0.8,
+          "evidence": {
+            "observed": "The harness classified this attempt's error as an infrastructure fault.",
+            "rule": "error_kind",
+            "quote": "Harbor EnvironmentStartTimeoutError: Environment did not start in 600 s; see ~/.cache/harbor/build.log; no verifier reward recorded"
+          }
+        },
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "a9817bff57137ff883cca6047daec520da2f342928019b7a1228403be2b89bf8",
+      "record": {
+        "task_id": "parse-log",
+        "model": "model-b",
+        "run_id": "parse-log__bbb2@0000000f",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": null,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor AuthenticationError: Invalid API key for provider example; no verifier reward recorded",
+        "agent": "codex",
+        "error_kind": "setup",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "setup_error",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The harness recorded a setup or configuration error for this attempt.",
+        "error": "Harbor AuthenticationError: Invalid API key for provider example; no verifier reward recorded"
+      },
+      "matches": [
+        {
+          "label": "setup_error",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The harness recorded a setup or configuration error for this attempt.",
+            "error": "Harbor AuthenticationError: Invalid API key for provider example; no verifier reward recorded"
+          }
+        },
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "d3668480b476c2385c3119deb73d8a34bfcdd1b1dde059954821c34bea2e8b93",
+      "record": {
+        "task_id": "parse-log",
+        "model": "model-b",
+        "run_id": "parse-log__bbb3@00000010",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor NonZeroAgentExitCodeError: Agent exited with code 2",
+        "agent": "codex",
+        "error_kind": "agent",
+        "task_version": "sha256:2222bbbb",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_fails",
+      "confidence": 0.75,
+      "evidence": {
+        "observed": "The reference solution did not pass in 1 of 1 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "parse-log__ref1@00000009",
+            "score": 0.0
+          }
+        ],
+        "task_version": "same as this attempt"
+      },
+      "matches": [
+        {
+          "label": "reference_fails",
+          "confidence": 0.75,
+          "evidence": {
+            "observed": "The reference solution did not pass in 1 of 1 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "parse-log__ref1@00000009",
+                "score": 0.0
+              }
+            ],
+            "task_version": "same as this attempt"
+          }
+        },
+        {
+          "label": "item_everyone_loses",
+          "confidence": 0.5,
+          "evidence": {
+            "observed": "No supplied system scored above zero (2 systems).",
+            "rubric_quote": null,
+            "models": [
+              "claude-code / example/model-a",
+              "codex / model-b"
+            ],
+            "model_count": 2,
+            "observation_count": 2,
+            "run_count": 2,
+            "zero_count": 2,
+            "scores_by_model": {
+              "claude-code / example/model-a": [
+                0.0
+              ],
+              "codex / model-b": [
+                0.0
+              ]
+            },
+            "scope": "All supplied observations only; this does not prove a bad item."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "8f9ef7844337854fc5e767fa3a65c962ec8f1f0a368e3ee0a3fda0e2c8b05b6d",
+      "record": {
+        "task_id": "sort-numbers",
+        "model": "example/model-a",
+        "run_id": "sort-numbers__aaa1@00000003",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "Other reward keys, not scored: tests_passed=0.4.\ncollected 5 items\nFAILED tests/test_sort.py::test_large_input - read ~/work/out.txt\n3 failed, 2 passed in 1.20s",
+        "judge_run": null,
+        "error": null,
+        "agent": "claude-code",
+        "task_version": "sha256:1111aaaa",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_flaky",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The reference solution passed 1 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref1@00000001",
+            "score": 1.0
+          },
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref2@00000002",
+            "score": 0.0
+          }
+        ]
+      },
+      "matches": [
+        {
+          "label": "reference_flaky",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The reference solution passed 1 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref1@00000001",
+                "score": 1.0
+              },
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref2@00000002",
+                "score": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "94a0a3860526f4230a46545efc20feace4ac8156360a5fd7d5821d1aaf42fbbc",
+      "record": {
+        "task_id": "sort-numbers",
+        "model": "example/model-a",
+        "run_id": "sort-numbers__aaa2@00000004",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "5 failed in 0.90s\n",
+        "judge_run": null,
+        "error": "Harbor AgentTimeoutError: Agent execution timed out after 600 seconds",
+        "agent": "claude-code",
+        "error_kind": "agent",
+        "task_version": "sha256:1111aaaa",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_flaky",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The reference solution passed 1 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref1@00000001",
+            "score": 1.0
+          },
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref2@00000002",
+            "score": 0.0
+          }
+        ]
+      },
+      "matches": [
+        {
+          "label": "reference_flaky",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The reference solution passed 1 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref1@00000001",
+                "score": 1.0
+              },
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref2@00000002",
+                "score": 0.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "8e472ea0859783a76f6d4bfdd8a484856c48ad1cda0e7e67b896c0febb6e4fd4",
+      "record": {
+        "task_id": "sort-numbers",
+        "model": "model-b",
+        "run_id": "sort-numbers__bbb2@00000006",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor ApiRateLimitError: 429 from provider (policy_override has_valid_reward=true)",
+        "agent": "codex",
+        "error_kind": "agent",
+        "task_version": "sha256:1111aaaa",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_flaky",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The reference solution passed 1 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref1@00000001",
+            "score": 1.0
+          },
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref2@00000002",
+            "score": 0.0
+          }
+        ]
+      },
+      "matches": [
+        {
+          "label": "reference_flaky",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The reference solution passed 1 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref1@00000001",
+                "score": 1.0
+              },
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref2@00000002",
+                "score": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "label": "attempts_flip",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "This system passed 1 of 3 attempts.",
+            "passes": 1,
+            "attempts": 3,
+            "passed_run_ids": [
+              "sort-numbers__bbb1@00000005"
+            ],
+            "other_run_ids": [
+              "sort-numbers__bbb2@00000006",
+              "sort-numbers__bbb3@00000007"
+            ],
+            "scope": "The results do not say whether the system, the task or the grader differs between attempts."
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "1c51af4757e97746584370f43a019672c4ed6a9192eb7fb4fccf43505c3ee246",
+      "record": {
+        "task_id": "sort-numbers",
+        "model": "model-b",
+        "run_id": "sort-numbers__bbb3@00000007",
+        "instruction": null,
+        "rubric_item_id": "reward",
+        "rubric_item_text": null,
+        "output": null,
+        "score": 0.0,
+        "judge_reasoning": "",
+        "judge_run": null,
+        "error": "Harbor WeirdSandboxError: sandbox reported state 7",
+        "agent": "codex",
+        "error_kind": "unknown",
+        "task_version": "sha256:1111aaaa",
+        "job_id": "harbor-job"
+      },
+      "label": "reference_flaky",
+      "confidence": 0.85,
+      "evidence": {
+        "observed": "The reference solution passed 1 of 2 attempts.",
+        "reference_runs": [
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref1@00000001",
+            "score": 1.0
+          },
+          {
+            "system": "oracle",
+            "run_id": "sort-numbers__ref2@00000002",
+            "score": 0.0
+          }
+        ]
+      },
+      "matches": [
+        {
+          "label": "reference_flaky",
+          "confidence": 0.85,
+          "evidence": {
+            "observed": "The reference solution passed 1 of 2 attempts.",
+            "reference_runs": [
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref1@00000001",
+                "score": 1.0
+              },
+              {
+                "system": "oracle",
+                "run_id": "sort-numbers__ref2@00000002",
+                "score": 0.0
+              }
+            ]
+          }
+        },
+        {
+          "label": "attempts_flip",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "This system passed 1 of 3 attempts.",
+            "passes": 1,
+            "attempts": 3,
+            "passed_run_ids": [
+              "sort-numbers__bbb1@00000005"
+            ],
+            "other_run_ids": [
+              "sort-numbers__bbb2@00000006",
+              "sort-numbers__bbb3@00000007"
+            ],
+            "scope": "The results do not say whether the system, the task or the grader differs between attempts."
+          }
+        },
+        {
+          "label": "unclassified_error",
+          "confidence": 0.4,
+          "evidence": {
+            "observed": "The harness recorded an error that the format does not classify.",
+            "error": "Harbor WeirdSandboxError: sandbox reported state 7"
+          }
+        }
+      ]
+    }
+  ]
+}

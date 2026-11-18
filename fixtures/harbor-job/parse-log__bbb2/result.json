@@ -1,0 +1,29 @@
+{
+  "id": "0000000f-0000-4000-8000-000000000000",
+  "task_name": "parse-log",
+  "trial_name": "parse-log__bbb2",
+  "trial_uri": "file:///home/example/jobs/2026-01-01__00-00-00/parse-log__bbb2",
+  "task_id": {
+    "path": "tasks/parse-log"
+  },
+  "source": null,
+  "task_checksum": "sha256:2222bbbb",
+  "config": {
+    "trial_name": "parse-log__bbb2",
+    "trials_dir": "/home/example/jobs"
+  },
+  "agent_info": {
+    "name": "codex",
+    "version": "1.0",
+    "model_info": {
+      "name": "model-b"
+    }
+  },
+  "verifier_result": null,
+  "exception_info": {
+    "exception_type": "AuthenticationError",
+    "exception_message": "Invalid API key for provider example",
+    "exception_traceback": "Traceback (most recent call last):\n  File \"/home/example/harbor/trial.py\", line 1\n",
+    "occurred_at": "2026-01-01T00:00:00Z"
+  }
+}
